@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+.container-page {
+  @apply mx-auto w-full max-w-6xl px-4;
+}
+
+
+:root {
+  --brand: #4f46e5;     /* indigo-600 */
+  --brandHover: #6366f1;/* indigo-500 */
+  --bgDark: #020617;    /* slate-950 */
+}
+
+.marquee {
+  animation: marquee 28s linear infinite;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.333%); }
+}
+
+
+:where(h2, h3)[id] {
+  scroll-margin-top: 7rem;
+}
+
