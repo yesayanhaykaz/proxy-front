@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { setSession } from "@/lib/auth";
 
 function redirectBack(planId: string, error: string, email?: string) {
-  const u = new URL("/checkout", process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
+  const u = new URL("/checkout", process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000");
   u.searchParams.set("plan", planId);
   u.searchParams.set("mode", "login");
   u.searchParams.set("error", encodeURIComponent(error));
   if (email) u.searchParams.set("email", email);
-  return NextResponse.redirect(u);
+  return NextResponse.redirect(u, 303);
 }
 
 export async function POST(req: Request) {
@@ -23,19 +23,33 @@ export async function POST(req: Request) {
     if (!email) return redirectBack(planId, "Email is required.");
     if (!password) return redirectBack(planId, "Password is required.", email);
 
-    // TODO: validate in DB. For now: mock success.
-    cookies().set("ps_session", `mock.${Buffer.from(email).toString("base64")}`, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
+    const base = process.env.API_BASE || "http://localhost:8081/api";
+
+    const loginRes = await fetch(`${base}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      cache: "no-store",
     });
 
-    const next = new URL("/dashboard", process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
-    next.searchParams.set("activated", planId);
+    if (!loginRes.ok) {
+      return redirectBack(planId, "Invalid email or password.", email);
+    }
 
-    return NextResponse.redirect(next);
+    const json = await loginRes.json(); // { status:"ok", user_id:"..." }
+    const userId = String(json.user_id || "");
+
+    if (!userId) {
+      return redirectBack(planId, "Bad backend response. Please try again.", email);
+    }
+
+    // ✅ sets ps_session in the format getSession() expects
+    setSession({ id: userId, email });
+
+    // ✅ back to the same checkout plan => right side becomes Payment panel
+    const next = new URL("/checkout", process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000");
+    next.searchParams.set("plan", planId);
+    return NextResponse.redirect(next, 303);
   } catch {
     return redirectBack(planId, "Server error. Please try again.");
   }

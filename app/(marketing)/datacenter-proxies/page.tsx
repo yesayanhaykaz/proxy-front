@@ -1,46 +1,45 @@
 import { ProxyTypeLanding } from "@/components/marketing/ProxyTypeLanding";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Datacenter Proxies — Fast, Stable & Affordable | Proxiesseller",
   description:
     "Buy datacenter proxies for speed, stability and automation. Great for SEO tools, scraping, monitoring and APIs. Static IPs with low latency.",
 };
 
-export default function Page() {
+export default async function Page() {
+  const site = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+  const r = await fetch(`${site}/api/plans?category=datacenter`, { cache: "no-store" });
+  const plans = r.ok ? await r.json() : [];
+
+  const previewPlans = (Array.isArray(plans) ? plans : []).slice(0, 3).map((p: any, idx: number) => ({
+    id: p.id,
+    title: p.name,
+    price: `$${Number(p.price || 0).toFixed(2)} ${p.priceUnit || "/mo"}`,
+    popular: Boolean(p.popular) || idx === 1,
+    bullets: [
+      "Static IPs",
+      "Low latency",
+      "HTTP/SOCKS5",
+      "Fast setup",
+      "Affordable pricing",
+    ],
+    bestFor: ["SEO tools", "Monitoring", "APIs"],
+    href: `/pricing?type=datacenter#plans`,
+  }));
+
   return (
     <ProxyTypeLanding
-        heroBg="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=2400&q=80"
+      heroBg="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=2400&q=80"
       typeSlug="datacenter"
       typeName="Datacenter Proxies"
       headline="High-speed datacenter IPs for automation"
       subheadline="Best for speed and scale: scraping, monitoring, SEO tools, and API workflows that need low latency and stable performance."
       ctaHref="/pricing?type=datacenter"
       secondaryCtaHref="/pricing?type=datacenter#plans"
-      previewPlans={[
-        {
-          id: "dc-1",
-          title: "Starter",
-          price: "$1.49 / IP",
-          bullets: ["Static IPs", "Low latency", "HTTP/SOCKS5", "Fast setup", "Affordable pricing"],
-          bestFor: ["SEO tools", "Monitoring", "Basic scraping"],
-        },
-        {
-          id: "dc-2",
-          title: "Professional",
-          price: "$7.49 / IP",
-          popular: true,
-          bullets: ["Higher concurrency", "Better throughput", "Stable sessions", "HTTP/SOCKS5", "Priority support"],
-          bestFor: ["Scaling scrapers", "APIs", "Automation"],
-        },
-        {
-          id: "dc-3",
-          title: "Enterprise",
-          price: "Custom",
-          bullets: ["Dedicated subnets", "SLA", "Custom routing", "Team access", "Onboarding"],
-          bestFor: ["Large operations", "Data pipelines", "High volume"],
-          href: "/contact",
-        },
-      ]}
+      previewPlans={previewPlans}
       rows={[
         { feature: "Speed", left: "Very high", right: "Medium" },
         { feature: "Cost", left: "Low", right: "Higher" },
@@ -60,22 +59,22 @@ export default function Page() {
         { title: "Great pricing", desc: "Affordable IPs for bulk automation and testing." },
         { title: "Stable sessions", desc: "Static IP behavior is perfect for stable tasks." },
       ]}
-testimonials={[
-  {
-    name: "Alex Johnson",
-    role: "E-commerce Analyst",
-    quote:
-      "These residential proxies improved our monitoring accuracy. IPs are clean, speed is consistent, and we saw fewer blocks after switching.",
-    rating: 5,
-  },
-  {
-    name: "Sarah Chen",
-    role: "Market Researcher",
-    quote:
-      "City-level targeting works great for research. Support responds quickly and helps with specific location requests.",
-    rating: 5,
-  },
-]}
+      testimonials={[
+        {
+          name: "Alex Johnson",
+          role: "E-commerce Analyst",
+          quote:
+            "Datacenter proxies are fast and stable for our automation. Great value and easy to integrate with our tooling.",
+          rating: 5,
+        },
+        {
+          name: "Sarah Chen",
+          role: "Market Researcher",
+          quote:
+            "Perfect for monitoring and API workflows. Low latency, stable sessions, and good pricing for volume.",
+          rating: 5,
+        },
+      ]}
       faqs={[
         { q: "Are datacenter proxies rotating?", a: "Most datacenter plans are static. Rotation may be offered via pool options." },
         { q: "Are SOCKS5 proxies available?", a: "Yes — SOCKS5 support depends on plan." },

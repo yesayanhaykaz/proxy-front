@@ -51,7 +51,5 @@ export function getSession(): SessionUser | null {
 
 
 export function isAuthenticated() {
-  const cookieStore = cookies();
-  const token = cookieStore.get("auth_token");
-  return !!token;
+  return Boolean(cookies().get("ps_session")?.value);
 }

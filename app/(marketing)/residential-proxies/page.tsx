@@ -1,15 +1,42 @@
 import { ProxyTypeLanding } from "@/components/marketing/ProxyTypeLanding";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Residential Proxies — Real ISP IPs & High Success Rate | Proxiesseller",
   description:
     "Buy residential proxies with real ISP IP reputation for web scraping, SERP tracking, sneaker bots, marketplaces and account management. Rotating pool with sticky sessions.",
 };
 
-export default function Page() {
+export default async function Page() {
+  const site = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+  const r = await fetch(`${site}/api/plans?category=residential`, { cache: "no-store" });
+  const plans = r.ok ? await r.json() : [];
+
+  // minimal mapping to your existing UI shape
+  const previewPlans = (Array.isArray(plans) ? plans : []).slice(0, 3).map((p: any, idx: number) => ({
+    id: p.id,
+    title: p.name, // or "Starter/Pro/Enterprise" if you want
+    price: `$${Number(p.price || 0).toFixed(2)} ${p.priceUnit || "/mo"}`,
+    popular: Boolean(p.popular) || idx === 1,
+    bullets: [
+      p.rotation === "static" ? "Static" : "Rotating",
+      "HTTP/SOCKS5",
+      "Instant setup",
+      "Dedicated credentials",
+      "24/7 Support",
+    ],
+    bestFor:
+      p.type === "datacenter"
+        ? ["API access", "Automation", "Stable sessions"]
+        : ["Scraping", "SERP tracking", "Account management"],
+    href: `/pricing?type=residential#plans`,
+  }));
+
   return (
     <ProxyTypeLanding
-        heroBg="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=80"
+      heroBg="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=80"
       typeSlug="residential"
       typeName="Residential Proxies"
       headline="Real residential IPs that blend in naturally"
@@ -17,31 +44,7 @@ export default function Page() {
       ctaHref="/pricing?type=residential"
       secondaryCtaHref="/pricing?type=residential#plans"
       secondaryCtaText="View all plans"
-      previewPlans={[
-        {
-          id: "res-1",
-          title: "Starter",
-          price: "$3.99 / GB",
-          bullets: ["Rotating pool", "Sticky sessions", "HTTP/SOCKS5", "Country targeting", "Fast setup"],
-          bestFor: ["SERP tracking", "Small scraping", "Account warmup"],
-        },
-        {
-          id: "res-2",
-          title: "Professional",
-          price: "$19.99 / GB",
-          popular: true,
-          bullets: ["Higher success", "More geo options", "Faster rotation", "Sticky sessions", "Priority support"],
-          bestFor: ["Marketplaces", "Social automation", "SEO monitoring"],
-        },
-        {
-          id: "res-3",
-          title: "Enterprise",
-          price: "Custom",
-          bullets: ["Dedicated allocation", "SLA", "Custom targeting", "Team access", "Onboarding"],
-          bestFor: ["Large scraping", "Ad verification", "Data pipelines"],
-          href: "/contact",
-        },
-      ]}
+      previewPlans={previewPlans}
       rows={[
         { feature: "Success Rate", left: "99%+", right: "92%" },
         { feature: "IP Reputation", left: "Real ISP", right: "Mixed" },
@@ -61,22 +64,22 @@ export default function Page() {
         { title: "Sticky sessions", desc: "Keep the same IP for a configurable session window." },
         { title: "Targeting", desc: "Choose countries (and more targeting options as you scale)." },
       ]}
-testimonials={[
-  {
-    name: "Alex Johnson",
-    role: "E-commerce Analyst",
-    quote:
-      "These residential proxies improved our monitoring accuracy. IPs are clean, speed is consistent, and we saw fewer blocks after switching.",
-    rating: 5,
-  },
-  {
-    name: "Sarah Chen",
-    role: "Market Researcher",
-    quote:
-      "City-level targeting works great for research. Support responds quickly and helps with specific location requests.",
-    rating: 5,
-  },
-]}
+      testimonials={[
+        {
+          name: "Alex Johnson",
+          role: "E-commerce Analyst",
+          quote:
+            "These residential proxies improved our monitoring accuracy. IPs are clean, speed is consistent, and we saw fewer blocks after switching.",
+          rating: 5,
+        },
+        {
+          name: "Sarah Chen",
+          role: "Market Researcher",
+          quote:
+            "City-level targeting works great for research. Support responds quickly and helps with specific location requests.",
+          rating: 5,
+        },
+      ]}
       faqs={[
         { q: "Are residential proxies rotating or static?", a: "Residential plans support rotation and sticky sessions depending on your configuration and plan." },
         { q: "Can I keep the same IP (sticky sessions)?", a: "Yes. Use sticky sessions to keep a stable IP for a session window." },

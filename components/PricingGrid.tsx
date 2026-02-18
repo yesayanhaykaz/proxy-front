@@ -5,16 +5,16 @@ import { useMemo, useState } from "react";
 
 export type ProxyPlan = {
   id: string | number;
-  name?: string;              // "Residential Proxy"
-  type?: string;              // residential | mobile | datacenter | fast
-  country?: string;           // US, EU, Asia, etc
-  rotation?: string;          // static | rotating
-  duration?: string;          // 7 days | 30 days | 1 month | etc
-  protocol?: string;          // socks | http | https
-  price?: number;             // 2.99
-  priceUnit?: string;         // "/ IP" or "/ GB"
-  bandwidthGb?: number;       // 5
-  features?: string[];        // list bullets
+  name?: string; // "Residential Proxy"
+  type?: string; // residential | mobile | datacenter | fast
+  country?: string; // US, EU, Asia, etc
+  rotation?: string; // static | rotating
+  duration?: string; // 7 days | 30 days | 1 month | etc
+  protocol?: string; // socks | http | https
+  price?: number; // 2.99
+  priceUnit?: string; // "/ IP" or "/ GB"
+  bandwidthGb?: number; // 5
+  features?: string[]; // list bullets
   popular?: boolean;
 };
 
@@ -26,7 +26,7 @@ type Filters = {
   protocol: string;
 };
 
-const norm = (v?: string) => (v ?? "").trim();
+const norm = (v?: string) => (v ?? "").trim().toLowerCase();
 
 function titleType(type?: string) {
   const t = (type || "").toLowerCase();
@@ -44,6 +44,8 @@ function badgeStyle(kind: "static" | "rotating") {
 }
 
 export function PricingGrid({ plans }: { plans: ProxyPlan[] }) {
+  const safePlans = Array.isArray(plans) ? plans : [];
+
   const [filters, setFilters] = useState<Filters>({
     type: "All Proxy Types",
     country: "All Countries",
@@ -59,7 +61,7 @@ export function PricingGrid({ plans }: { plans: ProxyPlan[] }) {
     const durations = new Set<string>();
     const protocols = new Set<string>();
 
-    for (const p of plans) {
+    for (const p of safePlans) {
       if (p.type) types.add(p.type);
       if (p.country) countries.add(p.country);
       if (p.rotation) rotations.add(p.rotation);
@@ -76,25 +78,31 @@ export function PricingGrid({ plans }: { plans: ProxyPlan[] }) {
       durations: sort(durations),
       protocols: sort(protocols),
     };
-  }, [plans]);
+  }, [safePlans]);
 
   const filtered = useMemo(() => {
-    return plans.filter((p) => {
+    return safePlans.filter((p) => {
       const t = norm(p.type);
       const c = norm(p.country);
       const r = norm(p.rotation);
       const d = norm(p.duration);
       const pr = norm(p.protocol);
 
-      if (filters.type !== "All Proxy Types" && filters.type !== t) return false;
-      if (filters.country !== "All Countries" && filters.country !== c) return false;
-      if (filters.rotation !== "All Rotation" && filters.rotation !== r) return false;
-      if (filters.duration !== "All Durations" && filters.duration !== d) return false;
-      if (filters.protocol !== "All Protocols" && filters.protocol !== pr) return false;
+const ft = norm(filters.type);
+const fc = norm(filters.country);
+const fr = norm(filters.rotation);
+const fd = norm(filters.duration);
+const fpr = norm(filters.protocol);
+
+if (!ft.startsWith("all") && ft !== t) return false;
+if (!fc.startsWith("all") && fc !== c) return false;
+if (!fr.startsWith("all") && fr !== r) return false;
+if (!fd.startsWith("all") && fd !== d) return false;
+if (!fpr.startsWith("all") && fpr !== pr) return false;
 
       return true;
     });
-  }, [plans, filters]);
+  }, [safePlans, filters]);
 
   const reset = () =>
     setFilters({
@@ -199,7 +207,10 @@ export function PricingGrid({ plans }: { plans: ProxyPlan[] }) {
           <div className="text-lg font-extrabold text-slate-950">No plans found</div>
           <div className="mt-2 text-sm text-slate-600">Try resetting filters or choosing fewer filters.</div>
           <div className="mt-4">
-            <button onClick={reset} className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold text-white hover:bg-indigo-700">
+            <button
+              onClick={reset}
+              className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold text-white hover:bg-indigo-700"
+            >
               Reset Filters
             </button>
           </div>
@@ -271,14 +282,14 @@ export function PricingGrid({ plans }: { plans: ProxyPlan[] }) {
                   ))}
                 </ul>
 
-<div className="mt-8">
-  <Link
-    href={`/checkout?plan=${encodeURIComponent(String(p.id))}`}
-    className="inline-flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-extrabold text-white hover:bg-indigo-500"
-  >
-    Buy now →
-  </Link>
-</div>
+                <div className="mt-8">
+                  <Link
+                    href={`/checkout?plan=${encodeURIComponent(String(p.id))}`}
+                    className="inline-flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-extrabold text-white hover:bg-indigo-500"
+                  >
+                    Buy now →
+                  </Link>
+                </div>
               </div>
             );
           })}

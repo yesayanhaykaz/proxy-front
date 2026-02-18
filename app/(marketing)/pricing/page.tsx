@@ -19,6 +19,12 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
+function getSiteUrl() {
+  // Use NEXT_PUBLIC_SITE_URL if you set it, else fallback in dev
+  const u = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || "http://localhost:3000";
+  return u.replace(/\/$/, "");
+}
+
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
@@ -40,6 +46,8 @@ function FeatureCard({
   title: string;
   desc: string;
 }) {
+
+
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition-all hover:border-indigo-200 hover:shadow-md">
       <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-indigo-500/5 to-purple-500/5 blur-2xl transition-all group-hover:scale-150" />
@@ -101,7 +109,9 @@ function StepCard({
 }
 
 export default async function PricingPage() {
-  const plans = await apiGet<ProxyPlan[]>("/plans");
+  const site = getSiteUrl();
+  const r = await fetch(`${site}/api/plans`, { cache: "no-store" });
+  const plans = r.ok ? await r.json() : [];
 
   return (
     <div className="overflow-hidden">

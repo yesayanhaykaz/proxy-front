@@ -61,3 +61,4 @@ export async function apiGet<T>(path: string): Promise<T> {
 
   return res.json() as Promise<T>;
 }
+

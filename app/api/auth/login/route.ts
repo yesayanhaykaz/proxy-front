@@ -1,47 +1,57 @@
 import { NextResponse } from "next/server";
+import { setSession } from "@/lib/auth";
 
-function safeNext(next?: string) {
-  const n = String(next || "/dashboard");
-  if (!n.startsWith("/")) return "/dashboard";
-  if (n.startsWith("//")) return "/dashboard";
-  return n;
+function safeNext(n: string) {
+  const t = (n || "").trim();
+  return t.startsWith("/") ? t : "/dashboard";
+}
+
+function errRedirect(reqUrl: string, next: string, code: string) {
+  const u = new URL("/auth/login", reqUrl);
+  u.searchParams.set("error", code);
+  u.searchParams.set("next", next);
+  return NextResponse.redirect(u, 303);
 }
 
 export async function POST(req: Request) {
   const form = await req.formData();
 
-  const email = String(form.get("email") || "").trim().toLowerCase();
+  const email = String(form.get("email") || "").trim();
   const password = String(form.get("password") || "");
-  const next = safeNext(form.get("next")?.toString());
+  const next = safeNext(String(form.get("next") || "/dashboard"));
 
-  if (!email || !password) {
-    const url = new URL("/auth/login", req.url);
-    url.searchParams.set("error", "missing_fields");
-    url.searchParams.set("next", next);
-    return NextResponse.redirect(url, 303);
+  if (!email || !password) return errRedirect(req.url, next, "missing_fields");
+
+  const base = (process.env.API_BASE || "http://localhost:8081/api").replace(/\/$/, "");
+
+  const apiRes = await fetch(`${base}/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    cache: "no-store",
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!apiRes.ok) {
+    // helpful debug: forward status (optional)
+    return errRedirect(req.url, next, "invalid");
   }
 
-  // TEMP AUTH: accept any credentials
-  const token = `ps_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+  const json: any = await apiRes.json().catch(() => ({}));
 
-  const res = NextResponse.redirect(new URL(next, req.url), 303);
+  // accept common response shapes
+  const userId =
+    String(json.user_id || "") ||
+    String(json.id || "") ||
+    String(json.user?.id || "") ||
+    String(json.data?.user_id || "") ||
+    "";
 
-  const isProd = process.env.NODE_ENV === "production";
-  res.cookies.set("ps_session", token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: isProd,
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  });
+  if (!userId) {
+    return errRedirect(req.url, next, "invalid");
+  }
 
-  res.cookies.set("ps_email", email, {
-    httpOnly: false,
-    sameSite: "lax",
-    secure: isProd,
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  });
+  // ✅ sets signed ps_session cookie that getSession() expects
+  setSession({ id: userId, email });
 
-  return res;
+  return NextResponse.redirect(new URL(next, req.url), 303);
 }

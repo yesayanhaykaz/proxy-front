@@ -10,6 +10,7 @@ type Mode = "login" | "register";
 export function CheckoutAuthPanel(props: {
   planId: string;
   initialMode?: Mode;
+  next?: string;
 }) {
   const searchParams = useSearchParams();
 
@@ -19,14 +20,22 @@ export function CheckoutAuthPanel(props: {
   const error = searchParams.get("error") || "";
   const emailFromUrl = searchParams.get("email") || "";
 
+  // ✅ where we should land after auth
+  const nextUrl = useMemo(() => {
+    const n = (props.next || "").trim();
+    if (n.startsWith("/")) return n;
+    return `/checkout?plan=${encodeURIComponent(props.planId)}`;
+  }, [props.next, props.planId]);
+
   const actionUrl = useMemo(() => {
     const base =
       mode === "register"
         ? "/api/auth/register-and-checkout"
         : "/api/auth/login-and-checkout";
-    // keep planId in URL so backend can redirect back correctly
-    return `${base}?plan=${encodeURIComponent(props.planId)}`;
-  }, [mode, props.planId]);
+
+    // ✅ keep planId + next for server redirect
+    return `${base}?plan=${encodeURIComponent(props.planId)}&next=${encodeURIComponent(nextUrl)}`;
+  }, [mode, props.planId, nextUrl]);
 
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
@@ -91,6 +100,9 @@ export function CheckoutAuthPanel(props: {
       <form className="mt-6 space-y-4" action={actionUrl} method="POST">
         <input type="hidden" name="planId" value={props.planId} />
         <input type="hidden" name="mode" value={mode} />
+
+        {/* ✅ CRITICAL: server uses this to redirect back to checkout */}
+        <input type="hidden" name="next" value={nextUrl} />
 
         <div>
           <label className="text-xs font-extrabold text-slate-700">Email</label>
