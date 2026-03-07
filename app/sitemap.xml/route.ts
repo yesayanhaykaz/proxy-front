@@ -1,0 +1,12 @@
+import { NextResponse } from 'next/server'
+
+export async function GET() {
+  const base = 'https://proxiesseller.cc'
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap><loc>${base}/page-sitemap.xml</loc></sitemap>
+  <sitemap><loc>${base}/proxy_cat-sitemap.xml</loc></sitemap>
+  <sitemap><loc>${base}/blog-sitemap.xml</loc></sitemap>
+</sitemapindex>`
+  return new NextResponse(xml, { headers: { 'Content-Type': 'application/xml' } })
+}
