@@ -2,56 +2,64 @@ import { NextResponse } from "next/server";
 import { setSession } from "@/lib/auth";
 
 function safeNext(n: string) {
-  const t = (n || "").trim();
-  return t.startsWith("/") ? t : "/dashboard";
+    const t = (n || "").trim();
+    return t.startsWith("/") ? t : "/dashboard";
 }
 
-function errRedirect(reqUrl: string, next: string, code: string) {
-  const u = new URL("/auth/login", reqUrl);
-  u.searchParams.set("error", code);
-  u.searchParams.set("next", next);
-  return NextResponse.redirect(u, 303);
+function errRedirect(req: Request, next: string, code: string) {
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const u = new URL("/auth/login", origin);
+
+    // лучше без "/" в названии параметра, иначе неудобно читать/парсить
+    u.searchParams.set("error", code);
+    u.searchParams.set("next", next);
+
+    return NextResponse.redirect(u, 303);
 }
 
 export async function POST(req: Request) {
-  const form = await req.formData();
+    const orig = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-  const email = String(form.get("email") || "").trim();
-  const password = String(form.get("password") || "");
-  const next = safeNext(String(form.get("next") || "/dashboard"));
+    const form = await req.formData();
 
-  if (!email || !password) return errRedirect(req.url, next, "missing_fields");
+    const email = String(form.get("email") || "").trim();
+    const password = String(form.get("password") || "");
+    const next = safeNext(String(form.get("next") || "/dashboard"));
 
-  const base = (process.env.API_BASE || "http://localhost:8081/api").replace(/\/$/, "");
+    if (!email || !password) return errRedirect(req, next, "missing_fields");
 
-  const apiRes = await fetch(`${base}/login`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    cache: "no-store",
-    body: JSON.stringify({ email, password }),
-  });
+    const base = (process.env.API_BASE || "http://localhost:8081/api").replace(/\/$/, "");
 
-  if (!apiRes.ok) {
-    // helpful debug: forward status (optional)
-    return errRedirect(req.url, next, "invalid");
-  }
+    let apiRes: Response;
+    try {
+        apiRes = await fetch(`${base}/login`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            cache: "no-store",
+            body: JSON.stringify({ email, password }),
+        });
+    } catch (e) {
+        // если бекенд недоступен — тоже редирект с нормальным origin
+        return errRedirect(req, next, "api_unreachable");
+    }
 
-  const json: any = await apiRes.json().catch(() => ({}));
+    if (!apiRes.ok) {
+        return errRedirect(req, next, "invalid");
+    }
 
-  // accept common response shapes
-  const userId =
-    String(json.user_id || "") ||
-    String(json.id || "") ||
-    String(json.user?.id || "") ||
-    String(json.data?.user_id || "") ||
-    "";
+    const json: any = await apiRes.json().catch(() => ({}));
 
-  if (!userId) {
-    return errRedirect(req.url, next, "invalid");
-  }
+    const userId =
+        String(json.user_id || "") ||
+        String(json.id || "") ||
+        String(json.user?.id || "") ||
+        String(json.data?.user_id || "") ||
+        "";
 
-  // ✅ sets signed ps_session cookie that getSession() expects
-  setSession({ id: userId, email });
+    if (!userId) return errRedirect(req, next, "invalid");
 
-  return NextResponse.redirect(new URL(next, req.url), 303);
+    setSession({ id: userId, email });
+
+    // успешный редирект тоже лучше делать через origin из заголовков
+    return NextResponse.redirect(new URL(next, orig), 303);
 }
