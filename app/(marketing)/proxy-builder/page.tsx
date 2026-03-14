@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import {redirect, useRouter} from "next/navigation";
+import {cookies} from "next/headers";
 
 const COUNTRIES = [
 { code:"us", name:"United States" },
@@ -38,12 +39,10 @@ const totalPrice = (pricePerGb * traffic).toFixed(2);
 
 const handleBuy = () => {
 
-  const uid = localStorage.getItem("user_id");
+  const c = cookies();
+  const isLoggedIn = Boolean(c.get("ps_session")?.value);
+  if (isLoggedIn) redirect("/dashboard");
 
-  if (!uid) {
-    router.push("/login");
-    return;
-  }
 
   const params = new URLSearchParams({
     network,
