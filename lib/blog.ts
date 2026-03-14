@@ -511,6 +511,650 @@ console.log(r.data);`,
         "For large-scale scraping, prefer a queue + concurrency limit instead of firing thousands of requests instantly.",
     }),
   },
+
+{
+  slug: "python-requests",
+  title: "Using Proxies with Python Requests – Complete Guide",
+  description:
+    "Learn how to configure HTTP and SOCKS5 proxies in Python requests. Includes authentication examples, rotating proxies, retries, and scraping best practices.",
+  publishDateISO: "2026-01-15",
+  readTime: "8 min read",
+  category: "Integration",
+  tags: ["python proxies", "requests proxy", "web scraping", "rotating proxies"],
+  author: { name: "Technical Team" },
+  badge: "Popular",
+  icon: "bi bi-filetype-py",
+  content: [
+
+{ type: "heading", id: "overview", text: "Overview" },
+
+{
+type: "paragraph",
+text:
+"Python is one of the most popular languages for web scraping, automation, and API integrations. When sending many requests to websites, using proxies becomes essential. Proxies help distribute requests across multiple IP addresses, reducing the risk of IP bans, rate limits, and captchas."
+},
+
+{
+type: "paragraph",
+text:
+"In this guide we will show how to configure Proxiesseller proxies with the Python requests library. You will learn how to connect through HTTP proxies, SOCKS5 proxies, and how to implement safe retry logic for production scrapers."
+},
+
+{ type: "heading", id: "installation", text: "Installing Required Libraries" },
+
+{
+type: "paragraph",
+text:
+"First install the required libraries. The requests library handles HTTP requests, while pysocks enables SOCKS proxy support."
+},
+
+{
+type: "code",
+lang: "bash",
+code:
+`pip install requests
+pip install pysocks`
+},
+
+{ type: "heading", id: "http-proxy", text: "Using an HTTP Proxy" },
+
+{
+type: "paragraph",
+text:
+"The simplest way to use a proxy with Python requests is by providing the proxy URL in the proxies dictionary. This example sends a request through an authenticated HTTP proxy."
+},
+
+{
+type: "code",
+lang: "python",
+code:
+`import requests
+
+proxies = {
+ "http": "http://USER:PASS@HOST:PORT",
+ "https": "http://USER:PASS@HOST:PORT"
+}
+
+response = requests.get("https://api.ipify.org", proxies=proxies)
+print(response.text)`
+},
+
+{
+type: "paragraph",
+text:
+"If the proxy is configured correctly, the returned IP address will be the proxy IP instead of your local machine's IP."
+},
+
+{ type: "heading", id: "socks5", text: "Using SOCKS5 Proxies" },
+
+{
+type: "paragraph",
+text:
+"SOCKS5 proxies are commonly used for automation and scraping because they support more protocols and better anonymity. When using SOCKS proxies in Python requests you must install the pysocks dependency."
+},
+
+{
+type: "code",
+lang: "python",
+code:
+`import requests
+
+proxies = {
+ "http": "socks5h://USER:PASS@HOST:PORT",
+ "https": "socks5h://USER:PASS@HOST:PORT"
+}
+
+response = requests.get("https://api.ipify.org", proxies=proxies)
+print(response.text)`
+},
+
+{
+type: "paragraph",
+text:
+"The socks5h scheme ensures DNS resolution also goes through the proxy. This prevents DNS leaks which could reveal your real IP address."
+},
+
+{ type: "heading", id: "rotation", text: "Implementing Proxy Rotation" },
+
+{
+type: "paragraph",
+text:
+"For large scraping projects you should rotate proxies instead of using the same IP for every request. Rotating proxies distributes traffic across many IP addresses and significantly reduces blocking."
+},
+
+{
+type: "code",
+lang: "python",
+code:
+`import random
+import requests
+
+PROXIES = [
+ "http://USER:PASS@HOST1:PORT",
+ "http://USER:PASS@HOST2:PORT",
+ "http://USER:PASS@HOST3:PORT"
+]
+
+proxy = random.choice(PROXIES)
+
+response = requests.get(
+ "https://example.com",
+ proxies={"http": proxy, "https": proxy},
+ timeout=15
+)
+
+print(response.status_code)`
+},
+
+{
+type: "paragraph",
+text:
+"In production systems proxy rotation is usually combined with retry logic and backoff delays to handle temporary blocks."
+},
+
+{ type: "heading", id: "retry", text: "Adding Retry Logic" },
+
+{
+type: "paragraph",
+text:
+"Websites sometimes return temporary errors such as HTTP 429 (rate limit) or connection timeouts. Instead of failing immediately, it is better to retry the request after a short delay."
+},
+
+{
+type: "code",
+lang: "python",
+code:
+`import requests
+import time
+
+for attempt in range(3):
+ try:
+  r = requests.get("https://example.com", timeout=15)
+  print(r.status_code)
+  break
+ except requests.exceptions.RequestException:
+  time.sleep(2)`
+},
+
+{
+type: "paragraph",
+text:
+"Combining retries with rotating proxies significantly increases scraping success rate."
+},
+
+{ type: "heading", id: "best-practices", text: "Best Practices for Scraping with Proxies" },
+
+{
+type: "list",
+items: [
+"Rotate IP addresses every few requests",
+"Limit request speed to avoid rate limits",
+"Use realistic user-agent headers",
+"Retry requests with exponential backoff",
+"Use sticky sessions for login-based workflows"
+]
+},
+
+{
+type: "callout",
+title: "Pro Tip",
+text:
+"Even with proxies, sending thousands of requests per second will get blocked. Always combine proxy rotation with realistic request rates and retry logic.",
+icon: "bi bi-lightbulb"
+}
+
+]
+},
+
+    {
+slug: "best-proxies-for-scraping",
+title: "Best Proxies for Web Scraping (Complete Guide)",
+description:
+"Discover which proxy types work best for web scraping projects and how to avoid blocks while collecting data.",
+publishDateISO: "2025-08-03",
+readTime: "10 min read",
+category: "Use Case",
+tags: ["web scraping","scraping proxies","data collection"],
+author: { name: "Technical Team" },
+badge: "Popular",
+icon: "bi bi-database",
+content: [
+
+{ type: "heading", id: "overview", text: "Overview" },
+
+{ type: "paragraph",
+text:
+"Web scraping often requires thousands of requests to target websites. Without proxies these requests come from a single IP and are quickly blocked." },
+
+{ type: "paragraph",
+text:
+"Using rotating proxy networks allows you to distribute traffic and collect data reliably." },
+
+{ type: "heading", id: "proxy-types", text: "Proxy Types for Scraping" },
+
+{ type: "list",
+items: [
+"Residential proxies – best balance of reliability and scale",
+"Mobile proxies – highest trust but more expensive",
+"Datacenter proxies – fastest but easier to detect"
+]},
+
+{ type: "heading", id: "scraping-tips", text: "Scraping Best Practices" },
+
+{ type: "list",
+items: [
+"Rotate proxies frequently",
+"Use realistic browser headers",
+"Implement retry logic",
+"Respect website rate limits"
+]},
+
+{ type: "callout",
+title: "Pro Tip",
+text:
+"Combine proxy rotation with intelligent request scheduling to maximize scraping success.",
+icon: "bi bi-lightbulb" }
+
+]
+},
+
+{
+slug: "avoid-ip-bans-scraping",
+title: "How to Avoid IP Bans While Scraping Websites",
+description:
+"Learn practical techniques to reduce blocks and captchas while scraping websites using rotating proxies.",
+publishDateISO: "2025-08-03",
+readTime: "9 min read",
+category: "Advanced",
+tags: ["scraping","ip bans","proxy rotation"],
+author: { name: "Technical Team" },
+badge: "Advanced",
+icon: "bi bi-shield-check",
+content: [
+
+{ type: "heading", id: "overview", text: "Overview" },
+
+{ type: "paragraph",
+text:
+"IP bans occur when websites detect unusual traffic patterns. Scraping tools sending hundreds of requests from the same IP address are easy to detect." },
+
+{ type: "heading", id: "methods", text: "Ways to Avoid Bans" },
+
+{ type: "list",
+items: [
+"Rotate proxies frequently",
+"Use realistic browser headers",
+"Add delays between requests",
+"Use session cookies correctly"
+]},
+
+{ type: "heading", id: "retry", text: "Retry Strategy" },
+
+{ type: "paragraph",
+text:
+"Retry failed requests with exponential backoff delays to avoid triggering anti-bot systems." },
+
+{ type: "code", lang: "text",
+code:
+`Retry pattern:
+1s delay
+3s delay
+7s delay` },
+
+{ type: "callout",
+title: "Pro Tip",
+text:
+"Never send thousands of requests instantly. Gradual traffic patterns appear more natural and reduce blocks.",
+icon: "bi bi-lightbulb" }
+
+]
+},
+
+
+
+    {
+slug: "seo-rank-tracking-proxies",
+title: "Using Proxies for SEO Rank Tracking",
+description:
+"Track Google rankings safely using rotating proxies and avoid captchas while collecting SEO data.",
+publishDateISO: "2025-08-03",
+readTime: "7 min read",
+category: "Use Case",
+tags: ["seo proxies","rank tracking","google scraping"],
+author: { name: "Technical Team" },
+badge: "Use Case",
+icon: "bi bi-graph-up",
+content: [
+
+{ type: "heading", id: "overview", text: "Overview" },
+
+{ type: "paragraph",
+text:
+"SEO tools often query search engines many times per day to collect ranking data. Without proxies these requests trigger captchas and temporary bans." },
+
+{ type: "heading", id: "solution", text: "Using Rotating Proxies" },
+
+{ type: "paragraph",
+text:
+"Rotating residential proxies distribute search requests across many IP addresses and reduce detection." },
+
+{ type: "heading", id: "workflow", text: "Typical Rank Tracking Workflow" },
+
+{ type: "list",
+items: [
+"Collect keywords",
+"Send search requests through rotating proxies",
+"Parse search results",
+"Store rankings for analysis"
+]},
+
+{ type: "callout",
+title: "Pro Tip",
+text:
+"For accurate rankings use proxies located in the same country as your target audience.",
+icon: "bi bi-lightbulb" }
+
+]
+},
+
+
+
+    {
+slug: "best-proxies-for-instagram",
+title: "Best Proxies for Instagram Automation",
+description: "Learn how to safely automate Instagram actions using mobile and residential proxies without triggering bans.",
+publishDateISO: "2026-03-16",
+readTime: "9 min read",
+category: "Use Case",
+tags: ["instagram proxies","social media automation","mobile proxies"],
+author: { name: "Technical Team" },
+badge: "Popular",
+icon: "bi bi-instagram",
+content: articleTemplate({
+intro:
+"Instagram aggressively blocks automation from single IP addresses. Proxies allow each account to operate from a different network location, making automation tools safer.",
+examples: [
+{
+title: "Recommended proxy setup",
+lang: "text",
+code: `1 account → 1 proxy
+Use mobile or residential proxies
+Keep sessions sticky for 30–60 minutes`,
+},
+{
+title: "Rotation pattern",
+lang: "text",
+code: `Login → Sticky IP
+Posting → Same IP
+Browsing → Optional rotation`,
+},
+],
+troubleshooting: [
+"If accounts get banned quickly: reduce automation speed",
+"If login verification triggers: keep same IP for sessions",
+"If captcha appears: rotate proxies less frequently",
+],
+proTip:
+"Mobile proxies usually have the highest trust score for social platforms.",
+}),
+},
+
+{
+slug: "python-rotating-proxies",
+title: "Python Rotating Proxies Tutorial",
+description: "Implement proxy rotation in Python for scraping projects with retry logic and request scheduling.",
+publishDateISO: "2026-03-17",
+readTime: "8 min read",
+category: "Integration",
+tags: ["python proxies","rotating proxies","scraping"],
+author: { name: "Technical Team" },
+icon: "bi bi-filetype-py",
+content: articleTemplate({
+intro:
+"Rotating proxies distribute requests across many IP addresses, reducing the chance of bans when scraping websites.",
+examples: [
+{
+title: "Simple proxy rotation",
+lang: "python",
+code: `import random, requests
+
+PROXIES = [
+"http://USER:PASS@HOST1:PORT",
+"http://USER:PASS@HOST2:PORT",
+]
+
+proxy = random.choice(PROXIES)
+
+requests.get("https://example.com",
+proxies={"http":proxy,"https":proxy})`,
+},
+],
+troubleshooting: [
+"If bans occur: rotate more frequently",
+"If timeouts occur: increase timeout value",
+"If proxies fail: test with api.ipify.org",
+],
+proTip:
+"Combine proxy rotation with exponential backoff retry logic.",
+}),
+},
+
+{
+slug: "selenium-proxy-authentication",
+title: "Selenium Proxy Authentication Guide",
+description: "Configure authenticated proxies with Selenium Chrome WebDriver for automation workflows.",
+publishDateISO: "2026-03-17",
+readTime: "7 min read",
+category: "Integration",
+tags: ["selenium proxies","automation","browser automation"],
+author: { name: "Technical Team" },
+icon: "bi bi-browser-chrome",
+content: articleTemplate({
+intro:
+"Selenium allows browser automation but websites often detect repeated actions from the same IP address. Proxies solve this problem.",
+examples: [
+{
+title: "Chrome proxy setup",
+lang: "python",
+code: `from selenium import webdriver
+opts = webdriver.ChromeOptions()
+opts.add_argument("--proxy-server=http://HOST:PORT")`,
+},
+],
+troubleshooting: [
+"If proxy ignored: verify Chrome flags",
+"If authentication fails: use extension-based auth",
+"If blocked: reduce automation speed",
+],
+proTip:
+"Use separate browser profiles per automation account.",
+}),
+},
+
+{
+slug: "amazon-scraping-proxies",
+title: "Best Proxies for Amazon Scraping",
+description: "Learn how to collect Amazon product data safely using rotating residential proxies.",
+publishDateISO: "2026-03-18",
+readTime: "10 min read",
+category: "Use Case",
+tags: ["amazon scraping","ecommerce scraping","proxy rotation"],
+author: { name: "Technical Team" },
+icon: "bi bi-cart",
+content: articleTemplate({
+intro:
+"Amazon actively blocks scraping attempts from single IP addresses. Proxy networks allow requests to appear from different users.",
+examples: [
+{
+title: "Safe scraping configuration",
+lang: "text",
+code: `Concurrency: 5–10
+Rotate proxies every 5–20 requests
+Use realistic user agents`,
+},
+],
+troubleshooting: [
+"If captchas increase: slow down request rate",
+"If 503 errors appear: rotate proxies",
+"If scraping fails: use residential proxies",
+],
+proTip:
+"Scrape category pages first to reduce requests to product pages.",
+}),
+},
+
+{
+slug: "captcha-solving-proxies",
+title: "Best Proxies for CAPTCHA Solving",
+description: "Combine proxies with captcha solving services to improve automation reliability.",
+publishDateISO: "2026-03-18",
+readTime: "7 min read",
+category: "Advanced",
+tags: ["captcha proxies","automation","anti-bot"],
+author: { name: "Technical Team" },
+icon: "bi bi-shield-lock",
+content: articleTemplate({
+intro:
+"Captcha solving services require stable IP addresses to maintain session integrity.",
+examples: [
+{
+title: "Captcha workflow",
+lang: "text",
+code: `Request page → detect captcha → send to solver → submit solution`,
+},
+],
+troubleshooting: [
+"If captcha fails: verify IP reputation",
+"If solver fails: retry with delay",
+"If captcha repeats: rotate proxy",
+],
+proTip:
+"Use the same IP during captcha solving to maintain session consistency.",
+}),
+},
+
+{
+slug: "shopify-scraping-proxies",
+title: "Shopify Store Scraping with Proxies",
+description: "Collect Shopify product data using rotating proxies and safe scraping patterns.",
+publishDateISO: "2026-03-19",
+readTime: "8 min read",
+category: "Use Case",
+tags: ["shopify scraping","ecommerce scraping","proxy rotation"],
+author: { name: "Technical Team" },
+icon: "bi bi-shop",
+content: articleTemplate({
+intro:
+"Shopify powers thousands of online stores. Scraping these stores requires proxy rotation to avoid detection.",
+examples: [
+{
+title: "Scraping flow",
+lang: "text",
+code: `Collect product URLs
+Rotate proxies
+Parse product data`,
+},
+],
+troubleshooting: [
+"If requests blocked: rotate IPs",
+"If HTML changes: update selectors",
+"If rate limited: slow requests",
+],
+proTip:
+"Use caching to reduce repeated scraping.",
+}),
+},
+
+{
+slug: "ticketmaster-proxies",
+title: "Best Proxies for Ticketmaster Bots",
+description: "Learn which proxies work best for ticket purchasing bots and avoiding blocks.",
+publishDateISO: "2026-03-19",
+readTime: "7 min read",
+category: "Use Case",
+tags: ["ticketmaster proxies","ticket bots"],
+author: { name: "Technical Team" },
+icon: "bi bi-ticket",
+content: articleTemplate({
+intro:
+"Ticket websites monitor unusual traffic patterns. Proxies distribute requests across multiple IP addresses.",
+examples: [
+{
+title: "Recommended setup",
+lang: "text",
+code: `Use residential proxies
+Rotate IP every request
+Limit concurrency`,
+},
+],
+troubleshooting: [
+"If site blocks quickly: use higher quality IPs",
+"If queue errors occur: reduce automation speed",
+"If captcha increases: rotate slower",
+],
+proTip:
+"Always keep the same IP during checkout sessions.",
+}),
+},
+
+{
+slug: "discord-bot-proxies",
+title: "Using Proxies with Discord Bots",
+description: "Avoid Discord rate limits by distributing bot traffic across proxies.",
+publishDateISO: "2026-03-20",
+readTime: "6 min read",
+category: "Integration",
+tags: ["discord proxies","bot automation"],
+author: { name: "Technical Team" },
+icon: "bi bi-discord",
+content: articleTemplate({
+intro:
+"Discord bots can hit rate limits quickly when running at scale.",
+examples: [
+{
+title: "Proxy rotation concept",
+lang: "text",
+code: `Assign proxy per bot instance`,
+},
+],
+troubleshooting: [
+"If rate limited: reduce message frequency",
+"If banned: rotate proxies",
+],
+proTip:
+"Use separate proxies per bot shard.",
+}),
+},
+
+{
+slug: "google-scraping-proxies",
+title: "Scraping Google Search Results with Proxies",
+description: "Avoid captchas when collecting Google search result data using rotating proxies.",
+publishDateISO: "2026-03-20",
+readTime: "9 min read",
+category: "Use Case",
+tags: ["google scraping","seo proxies"],
+author: { name: "Technical Team" },
+icon: "bi bi-google",
+content: articleTemplate({
+intro:
+"Google protects its search results heavily. Proxies allow safe data collection for SEO tools.",
+examples: [
+{
+title: "SERP scraping workflow",
+lang: "text",
+code: `Rotate proxy per request`,
+},
+],
+troubleshooting: [
+"If captcha appears: reduce speed",
+"If blocked: use residential proxies",
+],
+proTip:
+"Use geo-targeted proxies to collect location-specific rankings.",
+}),
+},
+
 ];
 
 

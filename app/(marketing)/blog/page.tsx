@@ -1,21 +1,39 @@
-// app/blog/page.tsx
 import type { Metadata } from "next";
 import { POSTS } from "@/lib/blog";
 import { BlogIndexClient } from "./BlogIndexClient";
 
 export const metadata: Metadata = {
-  title: "Proxy Guides & Integrations | Proxiesseller Blog",
+
+  title: "Proxy Guides, Tutorials & Scraping Tips | Proxiesseller",
+
   description:
-    "Integration guides, advanced proxy topics, and use-case workflows. Learn how to use Proxiesseller proxies with Python, Scrapy, Selenium, Puppeteer, cURL, Node.js, and more.",
-  alternates: { canonical: "/blog" },
+    "Learn how to use rotating proxies, scraping proxies, and automation proxies with Python, Selenium, Scrapy, Puppeteer, Node.js and more.",
+
+  keywords: [
+    "proxy guides",
+    "scraping proxies tutorial",
+    "rotating proxies",
+    "selenium proxies",
+    "python proxies",
+  ],
+
+  alternates: {
+    canonical: "https://www.proxiesseller.cc/blog",
+  },
+
   openGraph: {
-    title: "Proxy Guides & Integrations | Proxiesseller",
+    title: "Proxy Guides & Tutorials",
     description:
-      "Popular proxy integrations + advanced topics + use-case guides. Setup instructions for Python, Scrapy, Selenium, Puppeteer, cURL, Node.js and more.",
-    url: "/blog",
+      "Step-by-step tutorials for proxy integration, scraping, automation and SEO tracking.",
+    url: "https://www.proxiesseller.cc/blog",
+    siteName: "Proxiesseller",
     type: "website",
   },
-  robots: { index: true, follow: true },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function BlogIndexPage() {
