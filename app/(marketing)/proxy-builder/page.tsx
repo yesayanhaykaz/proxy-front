@@ -3,7 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function ProxyBuilderPage() {
+const countries = [
+{code:"us",name:"United States"},
+{code:"gb",name:"United Kingdom"},
+{code:"de",name:"Germany"},
+{code:"fr",name:"France"},
+{code:"nl",name:"Netherlands"},
+{code:"ru",name:"Russia"},
+{code:"tr",name:"Turkey"},
+{code:"cn",name:"China"},
+{code:"br",name:"Brazil"},
+{code:"in",name:"India"},
+];
+
+export default function ProxyBuilderPage(){
 
 const router = useRouter();
 
@@ -11,20 +24,40 @@ const [network,setNetwork] = useState("residential");
 const [session,setSession] = useState("sticky");
 const [protocol,setProtocol] = useState("http");
 const [location,setLocation] = useState("worldwide");
-const [sessionName,setSessionName] = useState(`randSession${Math.floor(Math.random()*9000)+1000}`);
+const [country,setCountry] = useState("us");
 
-const password = "******";
+const generateSession = () =>
+`session${Math.floor(Math.random()*900000)+100000}`;
+
+const [sessionName,setSessionName] = useState(generateSession());
+
+const ports = {
+http:10000,
+socks5:11000,
+ssl:12000
+};
+
+const port = ports[protocol];
 
 const username =
-`user,type_${network},session_${sessionName}`;
+`user,type_${network},session_${sessionName}${
+location==="country"?`,country_${country}`:""
+}`;
 
-const handleBuy = () => {
+const proxyServer = "portal.proxiesseller.cc";
+const password = "generated_password";
 
-router.push(`/checkout?network=${network}&session=${session}&protocol=${protocol}&location=${location}&sessionName=${sessionName}`);
+const copy = (text:string)=>navigator.clipboard.writeText(text);
+
+const handleBuy = ()=>{
+
+router.push(
+`/checkout?network=${network}&session=${session}&protocol=${protocol}&location=${location}&country=${country}&session=${sessionName}`
+);
 
 };
 
-return (
+return(
 
 <main className="bg-white min-h-screen">
 
@@ -34,42 +67,35 @@ return (
 Build Your Proxy
 </h1>
 
-<p className="mt-4 text-slate-600 max-w-2xl">
-Configure your proxy connection exactly how you need it.
-Select network, session behavior, protocol and location.
+<p className="mt-3 text-slate-600 max-w-2xl">
+Configure your proxy connection and instantly generate credentials for scraping,
+automation, SEO monitoring, or social media tools.
 </p>
 
+<div className="grid md:grid-cols-2 gap-12 mt-12">
 
-{/* CONFIG CARD */}
-
-<div className="mt-10 grid md:grid-cols-2 gap-12">
-
-{/* LEFT CONFIG */}
+{/* CONFIGURATION */}
 
 <div className="space-y-8">
 
 
-{/* NETWORK TYPE */}
+{/* NETWORK */}
 
 <div>
 
-<p className="font-semibold text-slate-800 mb-3">
-Network Type
-</p>
+<p className="font-semibold mb-3">Network Type</p>
 
 <div className="flex gap-3 flex-wrap">
 
-{["residential","mobile","datacenter","fast"].map(n => (
-
+{["residential","mobile","datacenter","fast"].map(n=>(
 <button
 key={n}
 onClick={()=>setNetwork(n)}
-className={`px-5 py-2 rounded-lg border capitalize ${
-network===n ? "bg-purple-600 text-white border-purple-600":"bg-white"
+className={`px-4 py-2 border rounded-lg capitalize ${
+network===n?"bg-purple-600 text-white":""
 }`}>
 {n}
 </button>
-
 ))}
 
 </div>
@@ -77,29 +103,26 @@ network===n ? "bg-purple-600 text-white border-purple-600":"bg-white"
 </div>
 
 
-
-{/* SESSION TYPE */}
+{/* SESSION */}
 
 <div>
 
-<p className="font-semibold text-slate-800 mb-3">
-Session Type
-</p>
+<p className="font-semibold mb-3">Session Type</p>
 
 <div className="flex gap-3">
 
 <button
 onClick={()=>setSession("sticky")}
-className={`px-5 py-2 rounded-lg border ${
-session==="sticky" ? "bg-purple-600 text-white":"bg-white"
+className={`px-4 py-2 border rounded-lg ${
+session==="sticky"?"bg-purple-600 text-white":""
 }`}>
 Sticky
 </button>
 
 <button
 onClick={()=>setSession("rotating")}
-className={`px-5 py-2 rounded-lg border ${
-session==="rotating" ? "bg-purple-600 text-white":"bg-white"
+className={`px-4 py-2 border rounded-lg ${
+session==="rotating"?"bg-purple-600 text-white":""
 }`}>
 Rotating
 </button>
@@ -109,91 +132,79 @@ Rotating
 </div>
 
 
-
 {/* SESSION NAME */}
 
 <div>
 
-<p className="font-semibold text-slate-800 mb-3">
-Session Name
-</p>
+<p className="font-semibold mb-3">Session Name</p>
+
+<div className="flex gap-2">
 
 <input
 value={sessionName}
 onChange={(e)=>setSessionName(e.target.value)}
-className="border rounded-lg px-4 py-2 w-full"
+className="border px-4 py-2 rounded-lg w-full"
 />
 
-<p className="text-xs text-slate-500 mt-2">
-Keep the same session name to maintain the same IP (max 60 min)
-</p>
+<button
+onClick={()=>setSessionName(generateSession())}
+className="px-4 py-2 border rounded-lg">
+↻
+</button>
 
 </div>
 
+<p className="text-xs text-slate-500 mt-2">
+Using the same session name keeps the same IP for up to 60 minutes.
+</p>
+
+</div>
 
 
 {/* PROTOCOL */}
 
 <div>
 
-<p className="font-semibold text-slate-800 mb-3">
-Connection Type
-</p>
+<p className="font-semibold mb-3">Connection Type</p>
 
 <div className="flex gap-3 flex-wrap">
 
+{["http","socks5","ssl"].map(p=>(
 <button
-onClick={()=>setProtocol("http")}
-className={`px-5 py-2 rounded-lg border ${
-protocol==="http" ? "bg-purple-600 text-white":"bg-white"
+key={p}
+onClick={()=>setProtocol(p)}
+className={`px-4 py-2 border rounded-lg uppercase ${
+protocol===p?"bg-purple-600 text-white":""
 }`}>
-HTTP Proxy
+{p}
 </button>
-
-<button
-onClick={()=>setProtocol("socks5")}
-className={`px-5 py-2 rounded-lg border ${
-protocol==="socks5" ? "bg-purple-600 text-white":"bg-white"
-}`}>
-SOCKS5 Proxy
-</button>
-
-<button
-onClick={()=>setProtocol("ssl")}
-className={`px-5 py-2 rounded-lg border ${
-protocol==="ssl" ? "bg-purple-600 text-white":"bg-white"
-}`}>
-SSL Proxy
-</button>
+))}
 
 </div>
 
 </div>
-
 
 
 {/* LOCATION */}
 
 <div>
 
-<p className="font-semibold text-slate-800 mb-3">
-Location
-</p>
+<p className="font-semibold mb-3">Location</p>
 
 <div className="flex gap-3">
 
 <button
 onClick={()=>setLocation("worldwide")}
-className={`px-5 py-2 rounded-lg border ${
-location==="worldwide" ? "bg-purple-600 text-white":"bg-white"
+className={`px-4 py-2 border rounded-lg ${
+location==="worldwide"?"bg-purple-600 text-white":""
 }`}>
 Worldwide
 </button>
 
 <button
 onClick={()=>setLocation("country")}
-className={`px-5 py-2 rounded-lg border ${
-location==="country" ? "bg-purple-600 text-white":"bg-white"
+className={`px-4 py-2 border rounded-lg ${
+location==="country"?"bg-purple-600 text-white":""
 }`}>
 Country
 </button>
@@ -202,43 +213,80 @@ Country
 
 </div>
 
+
+{/* COUNTRY SELECT */}
+
+{location==="country" && (
+
+<div>
+
+<p className="font-semibold mb-3">Select Country</p>
+
+<select
+value={country}
+onChange={(e)=>setCountry(e.target.value)}
+className="border px-4 py-2 rounded-lg w-full">
+
+{countries.map(c=>(
+<option key={c.code} value={c.code}>
+{c.name}
+</option>
+))}
+
+</select>
+
+</div>
+
+)}
+
+
 </div>
 
 
-
-{/* RIGHT SIDE PREVIEW */}
+{/* CREDENTIAL PREVIEW */}
 
 <div className="bg-slate-50 border rounded-xl p-6 h-fit">
 
 <h3 className="text-xl font-semibold mb-6">
-Proxy Credentials Preview
+Proxy Credentials
 </h3>
 
 <div className="space-y-4">
 
 <div>
 <p className="text-sm text-slate-500">Proxy Server</p>
-<p className="font-semibold">portal.proxiesseller.cc</p>
+<div className="flex justify-between items-center">
+<p className="font-mono">{proxyServer}</p>
+<button onClick={()=>copy(proxyServer)}>Copy</button>
+</div>
 </div>
 
 <div>
 <p className="text-sm text-slate-500">Port</p>
-<p className="font-semibold">1080</p>
+<div className="flex justify-between items-center">
+<p className="font-mono">{port}</p>
+<button onClick={()=>copy(String(port))}>Copy</button>
+</div>
 </div>
 
 <div>
 <p className="text-sm text-slate-500">Username</p>
-<p className="font-mono text-sm break-all">
-{username}
-</p>
+<div className="flex justify-between items-center">
+<p className="font-mono break-all">{username}</p>
+<button onClick={()=>copy(username)}>Copy</button>
+</div>
 </div>
 
 <div>
 <p className="text-sm text-slate-500">Password</p>
+<div className="flex justify-between items-center">
 <p className="font-mono">{password}</p>
+<button onClick={()=>copy(password)}>Copy</button>
+</div>
 </div>
 
 </div>
+
 
 <button
 onClick={handleBuy}
