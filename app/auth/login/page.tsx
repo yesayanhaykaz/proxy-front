@@ -22,12 +22,16 @@ export default function LoginPage({
   searchParams?: { next?: string; error?: string };
 }) {
   // ✅ If already logged in -> go dashboard
+
+
+
   const c = cookies();
   const isLoggedIn = Boolean(c.get("ps_session")?.value);
-  if (isLoggedIn) redirect("/dashboard");
 
   const next = safeNext(searchParams?.next ? String(searchParams.next) : "/dashboard");
   const error = searchParams?.error ? String(searchParams.error) : "";
+
+if (isLoggedIn) redirect(next);
 
   const errorText =
     error === "missing_fields"
