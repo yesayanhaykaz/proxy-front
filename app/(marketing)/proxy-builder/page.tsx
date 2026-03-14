@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {redirect, useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 
 
 const COUNTRIES = [
@@ -41,23 +41,22 @@ const handleBuy = () => {
 
   const isLoggedIn = document.cookie.includes("ps_session=");
 
-  if (!isLoggedIn) {
-    router.push("/auth/login");
-    return;
-  }
-
   const params = new URLSearchParams({
+    custom: "1",
     network,
     session,
     protocol,
     location,
     country,
-    traffic: String(traffic)
+    traffic: String(traffic),
   });
 
-router.push(
-  `/checkout?custom=1&network=${network}&session=${session}&protocol=${protocol}&location=${location}&country=${country}&traffic=${traffic}`
-);
+  if (!isLoggedIn) {
+    router.push(`/auth/login?next=/checkout?${params.toString()}`);
+    return;
+  }
+
+  router.push(`/checkout?${params.toString()}`);
 };
 
 return(
@@ -214,8 +213,9 @@ Country
 <select
 value={country}
 onChange={(e)=>setCountry(e.target.value)}
-className="border px-4 py-2 rounded-xl w-full"
+className="w-full appearance-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-indigo-400 focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-200"
 >
+
 
 {COUNTRIES.map(c=>(
 <option key={c.code} value={c.code}>
@@ -239,8 +239,9 @@ className="border px-4 py-2 rounded-xl w-full"
 <select
 value={traffic}
 onChange={(e)=>setTraffic(Number(e.target.value))}
-className="border px-4 py-2 rounded-xl w-full"
+className="w-full appearance-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-indigo-400 focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-200"
 >
+
 
 <option value={1}>1 GB</option>
 <option value={5}>5 GB</option>
