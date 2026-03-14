@@ -1,4 +1,4 @@
-// app/auth/login/page.ts
+// app/auth/login/route.ts
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
