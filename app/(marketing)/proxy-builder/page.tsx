@@ -31,13 +31,15 @@ const generateSession = () =>
 
 const [sessionName,setSessionName] = useState(generateSession());
 
-const ports = {
-http:10000,
-socks5:11000,
-ssl:12000
-};
 
-const port = ports[protocol];
+const ports = {
+  http: 10000,
+  socks5: 11000,
+  ssl: 12000,
+} as const;
+
+const port = ports[protocol as keyof typeof ports];
+
 
 const username =
 `user,type_${network},session_${sessionName}${
