@@ -32,49 +32,29 @@ const [protocol,setProtocol] = useState("socks5");
 const [location,setLocation] = useState("worldwide");
 const [country,setCountry] = useState("us");
 const [traffic,setTraffic] = useState(1);
-const [userId,setUserId] = useState<string | null>(null);
-
-useEffect(()=>{
-const uid = localStorage.getItem("user_id");
-if(uid){
-setUserId(uid);
-}
-},[]);
 
 const pricePerGb = PRICE_TABLE[network];
 const totalPrice = (pricePerGb * traffic).toFixed(2);
 
-const handleBuy = async () => {
+const handleBuy = () => {
 
-if(!userId){
-router.push("/login");
-return;
-}
+  const uid = localStorage.getItem("user_id");
 
-const res = await fetch("/api/order",{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-"X-User-Id":userId
-},
-body:JSON.stringify({
-network,
-session,
-protocol,
-location,
-country,
-traffic
-})
-});
+  if (!uid) {
+    router.push("/login");
+    return;
+  }
 
-const data = await res.json();
+  const params = new URLSearchParams({
+    network,
+    session,
+    protocol,
+    location,
+    country,
+    traffic: String(traffic)
+  });
 
-if(data.purchase_id){
-router.push("/dashboard");
-}else{
-alert("Order failed");
-console.log(data);
-}
+  router.push(`/checkout?${params.toString()}`);
 
 };
 
@@ -334,10 +314,11 @@ ${totalPrice}
 
 <button
 onClick={handleBuy}
-className="mt-8 inline-flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-extrabold text-white hover:bg-indigo-500"
+className="inline-flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-extrabold text-white hover:bg-indigo-500"
 >
 Buy Proxy
 </button>
+
 
 <p className="text-xs text-slate-500 mt-4">
 Credentials will be generated instantly after purchase.
