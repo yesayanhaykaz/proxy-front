@@ -55,7 +55,9 @@ const handleBuy = () => {
     traffic: String(traffic)
   });
 
-  router.push(`/checkout?${params.toString()}`);
+router.push(
+  `/checkout?custom=1&network=${network}&session=${session}&protocol=${protocol}&location=${location}&country=${country}&traffic=${traffic}`
+);
 };
 
 return(

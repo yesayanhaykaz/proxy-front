@@ -40,7 +40,19 @@ async function getPlan(planId: string) {
   };
 }
 
-function CheckoutPaymentPanel({ email, planId }: { email: string; planId: string }) {
+type CheckoutPaymentPanelProps = {
+  email: string;
+  planId: string;
+  params: {
+    network?: string;
+    session?: string;
+    protocol?: string;
+    country?: string;
+    traffic?: string;
+  };
+};
+
+function CheckoutPaymentPanel({ email, planId, params }: CheckoutPaymentPanelProps) {
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
       <div className="text-sm font-extrabold text-slate-500">Checkout</div>
@@ -61,7 +73,12 @@ function CheckoutPaymentPanel({ email, planId }: { email: string; planId: string
       </div>
 
       <form action="/api/checkout/start" method="POST" className="mt-6">
-        <input type="hidden" name="plan" value={planId} />
+<input type="hidden" name="plan" value={planId} />
+<input type="hidden" name="network" value={params.network || ""} />
+<input type="hidden" name="session" value={params.session || ""} />
+<input type="hidden" name="protocol" value={params.protocol || ""} />
+<input type="hidden" name="country" value={params.country || ""} />
+<input type="hidden" name="traffic" value={params.traffic || ""} />
         <button
           type="submit"
           className="inline-flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white hover:bg-indigo-500"
@@ -80,15 +97,74 @@ function CheckoutPaymentPanel({ email, planId }: { email: string; planId: string
   );
 }
 
+function getCustomPlan(params: any) {
+
+  const PRICE_TABLE: any = {
+    residential: 2,
+    mobile: 5,
+    datacenter: 0.8,
+    fast: 1.2,
+  };
+
+  const network = params.network || "residential";
+  const traffic = Number(params.traffic || 1);
+  const price = PRICE_TABLE[network] * traffic;
+
+  return {
+    id: "custom",
+    name: `${network} proxy`,
+    price,
+    period: "one-time",
+    highlights: [
+      { k: network, v: "Network" },
+      { k: traffic + "GB", v: "Traffic" },
+      { k: params.session, v: "Session" },
+      { k: `$${price.toFixed(2)}`, v: "Price" },
+    ],
+    bulletsLeft: [
+      "Instant activation",
+      "Username/password auth",
+      "Global endpoints",
+      "High uptime",
+    ],
+    bulletsRight: [
+      "Dashboard control",
+      "Usage tracking",
+      "Low block rate",
+      "Multiple locations",
+    ],
+    trial: "Custom proxy configuration",
+  };
+}
+
+
 export default async function CheckoutPage({
   searchParams,
 }: {
-  searchParams: { plan?: string; mode?: "login" | "register" };
+  searchParams: {
+  plan?: string;
+  mode?: "login" | "register";
+  custom?: string;
+  network?: string;
+  session?: string;
+  protocol?: string;
+  location?: string;
+  country?: string;
+  traffic?: string;
+}
 }) {
   const planId = searchParams.plan ? String(searchParams.plan) : "";
+  const isCustom = searchParams.custom === "1";
+
   const mode = searchParams.mode === "login" ? "login" : "register";
 
-  const plan = planId ? await getPlan(planId) : null;
+let plan = null;
+
+if (isCustom) {
+  plan = getCustomPlan(searchParams);
+} else if (planId) {
+  plan = await getPlan(planId);
+}
 
   if (!plan) {
     return (
@@ -192,13 +268,25 @@ export default async function CheckoutPage({
           </section>
 
           {/* RIGHT: AUTH or PAYMENT */}
-          {isAuthed ? (
-            <CheckoutPaymentPanel email={email} planId={String(plan.id)} />
-          ) : (
-            <CheckoutAuthPanel planId={String(plan.id)} initialMode={mode} next={nextUrl} />
-          )}
+          {/* RIGHT: AUTH or PAYMENT */}
+{isAuthed ? (
+  <CheckoutPaymentPanel
+    email={email}
+    planId={String(plan.id)}
+    params={searchParams}
+  />
+) : (
+  <CheckoutAuthPanel
+    planId={String(plan.id)}
+    initialMode={mode}
+    next={nextUrl}
+  />
+)}
+
         </div>
       </main>
     </div>
   );
 }
+
+
