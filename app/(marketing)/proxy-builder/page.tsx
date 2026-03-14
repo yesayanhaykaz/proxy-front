@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import {redirect, useRouter} from "next/navigation";
-import {cookies} from "next/headers";
+
 
 const COUNTRIES = [
 { code:"us", name:"United States" },
@@ -39,10 +39,12 @@ const totalPrice = (pricePerGb * traffic).toFixed(2);
 
 const handleBuy = () => {
 
-  const c = cookies();
-  const isLoggedIn = Boolean(c.get("ps_session")?.value);
-  if (isLoggedIn) redirect("/dashboard");
+  const isLoggedIn = document.cookie.includes("ps_session=");
 
+  if (!isLoggedIn) {
+    router.push("/auth/login");
+    return;
+  }
 
   const params = new URLSearchParams({
     network,
@@ -54,7 +56,6 @@ const handleBuy = () => {
   });
 
   router.push(`/checkout?${params.toString()}`);
-
 };
 
 return(
