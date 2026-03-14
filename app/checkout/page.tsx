@@ -202,7 +202,7 @@ if (isCustom) {
   const isAuthed = Boolean(session) || hasAuthCookie;
 
   // ✅ next URL keeps same plan
-  const nextUrl = `/checkout?plan=${encodeURIComponent(String(plan.id))}`;
+ const nextUrl = `/checkout?${new URLSearchParams(searchParams as any).toString()}`;
 
   return (
     <div className="min-h-screen bg-slate-50">
