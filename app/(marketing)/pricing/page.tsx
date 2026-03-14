@@ -287,6 +287,19 @@ export default async function PricingPage() {
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
       </section>
 
+      {/* PRICING GRID */}
+      <section id="plans" className="container-page py-16 md:py-20">
+        <div className="text-center">
+          <h2 className="text-3xl font-black text-slate-900 md:text-4xl">Choose your plan</h2>
+          <p className="mt-3 text-base text-slate-600">
+            All plans include instant activation, dashboard access, and technical support
+          </p>
+        </div>
+        <div className="mt-12">
+          <PricingGrid plans={plans} />
+        </div>
+      </section>
+
       {/* TRUST */}
       <section className="border-b border-slate-200/80 bg-gradient-to-b from-slate-50 to-white">
         <div className="container-page py-10">
@@ -421,19 +434,6 @@ export default async function PricingPage() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* PRICING GRID */}
-      <section id="plans" className="container-page py-16 md:py-20">
-        <div className="text-center">
-          <h2 className="text-3xl font-black text-slate-900 md:text-4xl">Choose your plan</h2>
-          <p className="mt-3 text-base text-slate-600">
-            All plans include instant activation, dashboard access, and technical support
-          </p>
-        </div>
-        <div className="mt-12">
-          <PricingGrid plans={plans} />
         </div>
       </section>
 
