@@ -1,25 +1,32 @@
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const form = await req.formData();
+  try {
+    let form: FormData | null = null;
 
-  const plan = form.get("plan");
-  const network = form.get("network");
-  const session = form.get("session");
-  const protocol = form.get("protocol");
-  const country = form.get("country");
-  const traffic = form.get("traffic");
+    try {
+      form = await req.formData();
+    } catch {
+      form = null;
+    }
 
-  console.log("Checkout request:", {
-    plan,
-    network,
-    session,
-    protocol,
-    country,
-    traffic,
-  });
+    const data = form
+      ? Object.fromEntries(form.entries())
+      : {};
 
-  // TODO: create order here
+    console.log("Checkout request:", data);
 
-  return NextResponse.redirect(new URL("/dashboard", req.url));
+    return NextResponse.json({
+      ok: true,
+      received: data
+    });
+
+  } catch (err) {
+    console.error("Checkout error:", err);
+
+    return NextResponse.json(
+      { error: "checkout failed" },
+      { status: 500 }
+    );
+  }
 }
