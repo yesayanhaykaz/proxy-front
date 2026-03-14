@@ -159,7 +159,7 @@ Country
 
 <a
 href={buyLink}
-className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-10 py-4 rounded-xl font-semibold text-lg shadow-lg">
+className="mt-8 inline-flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-extrabold text-white hover:bg-indigo-500">
 Get Proxy Now
 </a>
 

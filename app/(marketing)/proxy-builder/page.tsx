@@ -1,28 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const COUNTRIES = [
-{ code: "us", name: "United States" },
-{ code: "gb", name: "United Kingdom" },
-{ code: "de", name: "Germany" },
-{ code: "fr", name: "France" },
-{ code: "nl", name: "Netherlands" },
-{ code: "tr", name: "Turkey" },
-{ code: "ru", name: "Russia" },
-{ code: "br", name: "Brazil" },
-{ code: "in", name: "India" },
+{ code:"us", name:"United States" },
+{ code:"gb", name:"United Kingdom" },
+{ code:"de", name:"Germany" },
+{ code:"fr", name:"France" },
+{ code:"nl", name:"Netherlands" },
+{ code:"tr", name:"Turkey" },
+{ code:"ru", name:"Russia" },
+{ code:"br", name:"Brazil" },
+{ code:"in", name:"India" }
 ];
 
-const PRICE_TABLE: any = {
-residential: 2,
-mobile: 5,
-datacenter: 0.8,
-fast: 1.2
+const PRICE_TABLE:any = {
+residential:2,
+mobile:5,
+datacenter:0.8,
+fast:1.2
 };
 
-export default function ProxyBuilderPage() {
+export default function ProxyBuilderPage(){
 
 const router = useRouter();
 
@@ -32,16 +32,21 @@ const [protocol,setProtocol] = useState("socks5");
 const [location,setLocation] = useState("worldwide");
 const [country,setCountry] = useState("us");
 const [traffic,setTraffic] = useState(1);
+const [userId,setUserId] = useState<string | null>(null);
+
+useEffect(()=>{
+const uid = localStorage.getItem("user_id");
+if(uid){
+setUserId(uid);
+}
+},[]);
 
 const pricePerGb = PRICE_TABLE[network];
 const totalPrice = (pricePerGb * traffic).toFixed(2);
 
 const handleBuy = async () => {
 
-const user_id = localStorage.getItem("user_id");
-
-if(!user_id){
-alert("Please login first");
+if(!userId){
 router.push("/login");
 return;
 }
@@ -49,11 +54,10 @@ return;
 const res = await fetch("/api/order",{
 method:"POST",
 headers:{
-"Content-Type":"application/json"
+"Content-Type":"application/json",
+"X-User-Id":userId
 },
 body:JSON.stringify({
-user_id,
-package_id:"default",
 network,
 session,
 protocol,
@@ -69,6 +73,7 @@ if(data.purchase_id){
 router.push("/dashboard");
 }else{
 alert("Order failed");
+console.log(data);
 }
 
 };
@@ -84,20 +89,19 @@ Build Your Proxy
 </h1>
 
 <p className="mt-4 text-slate-600 max-w-2xl">
-Configure your proxy network, location, session type and traffic.
-Your proxy credentials will be generated instantly after purchase.
+Configure your proxy network, location and traffic. Your proxy credentials
+will be generated instantly after purchase.
 </p>
 
 <div className="grid md:grid-cols-2 gap-12 mt-12">
 
-{/* LEFT CONFIG */}
+{/* LEFT SIDE */}
 
 <div className="space-y-8">
 
 {/* NETWORK */}
 
 <div>
-
 <p className="font-semibold mb-3">Network Type</p>
 
 <div className="flex gap-3 flex-wrap">
@@ -106,15 +110,17 @@ Your proxy credentials will be generated instantly after purchase.
 <button
 key={n}
 onClick={()=>setNetwork(n)}
-className={`px-4 py-2 rounded-lg border capitalize ${
-network===n ? "bg-purple-600 text-white border-purple-600":""
-}`}>
+className={`px-4 py-2 rounded-xl border capitalize ${
+network===n
+? "bg-indigo-600 text-white border-indigo-600"
+: "hover:bg-slate-100"
+}`}
+>
 {n}
 </button>
 ))}
 
 </div>
-
 </div>
 
 
@@ -128,17 +134,23 @@ network===n ? "bg-purple-600 text-white border-purple-600":""
 
 <button
 onClick={()=>setSession("sticky")}
-className={`px-4 py-2 border rounded-lg ${
-session==="sticky" ? "bg-purple-600 text-white":""
-}`}>
+className={`px-4 py-2 border rounded-xl ${
+session==="sticky"
+? "bg-indigo-600 text-white border-indigo-600"
+: "hover:bg-slate-100"
+}`}
+>
 Sticky
 </button>
 
 <button
 onClick={()=>setSession("rotating")}
-className={`px-4 py-2 border rounded-lg ${
-session==="rotating" ? "bg-purple-600 text-white":""
-}`}>
+className={`px-4 py-2 border rounded-xl ${
+session==="rotating"
+? "bg-indigo-600 text-white border-indigo-600"
+: "hover:bg-slate-100"
+}`}
+>
 Rotating
 </button>
 
@@ -159,9 +171,12 @@ Rotating
 <button
 key={p}
 onClick={()=>setProtocol(p)}
-className={`px-4 py-2 border rounded-lg uppercase ${
-protocol===p ? "bg-purple-600 text-white":""
-}`}>
+className={`px-4 py-2 border rounded-xl uppercase ${
+protocol===p
+? "bg-indigo-600 text-white border-indigo-600"
+: "hover:bg-slate-100"
+}`}
+>
 {p}
 </button>
 ))}
@@ -181,17 +196,23 @@ protocol===p ? "bg-purple-600 text-white":""
 
 <button
 onClick={()=>setLocation("worldwide")}
-className={`px-4 py-2 border rounded-lg ${
-location==="worldwide" ? "bg-purple-600 text-white":""
-}`}>
+className={`px-4 py-2 border rounded-xl ${
+location==="worldwide"
+? "bg-indigo-600 text-white border-indigo-600"
+: "hover:bg-slate-100"
+}`}
+>
 Worldwide
 </button>
 
 <button
 onClick={()=>setLocation("country")}
-className={`px-4 py-2 border rounded-lg ${
-location==="country" ? "bg-purple-600 text-white":""
-}`}>
+className={`px-4 py-2 border rounded-xl ${
+location==="country"
+? "bg-indigo-600 text-white border-indigo-600"
+: "hover:bg-slate-100"
+}`}
+>
 Country
 </button>
 
@@ -200,7 +221,7 @@ Country
 </div>
 
 
-{/* COUNTRY SELECT */}
+{/* COUNTRY */}
 
 {location==="country" && (
 
@@ -211,7 +232,8 @@ Country
 <select
 value={country}
 onChange={(e)=>setCountry(e.target.value)}
-className="border px-4 py-2 rounded-lg w-full">
+className="border px-4 py-2 rounded-xl w-full"
+>
 
 {COUNTRIES.map(c=>(
 <option key={c.code} value={c.code}>
@@ -235,7 +257,8 @@ className="border px-4 py-2 rounded-lg w-full">
 <select
 value={traffic}
 onChange={(e)=>setTraffic(Number(e.target.value))}
-className="border px-4 py-2 rounded-lg w-full">
+className="border px-4 py-2 rounded-xl w-full"
+>
 
 <option value={1}>1 GB</option>
 <option value={5}>5 GB</option>
@@ -250,10 +273,9 @@ className="border px-4 py-2 rounded-lg w-full">
 </div>
 
 
+{/* RIGHT SUMMARY */}
 
-{/* RIGHT SIDE */}
-
-<div className="bg-slate-50 border rounded-xl p-8 h-fit">
+<div className="bg-slate-50 border rounded-2xl p-8 h-fit">
 
 <h3 className="text-xl font-semibold mb-6">
 Order Summary
@@ -303,7 +325,7 @@ ${pricePerGb}
 Estimated total
 </p>
 
-<p className="text-3xl font-bold text-purple-600">
+<p className="text-3xl font-bold text-indigo-600">
 ${totalPrice}
 </p>
 
@@ -312,14 +334,13 @@ ${totalPrice}
 
 <button
 onClick={handleBuy}
-className="mt-8 w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-semibold text-lg">
-
+className="mt-8 inline-flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-extrabold text-white hover:bg-indigo-500"
+>
 Buy Proxy
-
 </button>
 
 <p className="text-xs text-slate-500 mt-4">
-Credentials will be generated instantly after payment.
+Credentials will be generated instantly after purchase.
 </p>
 
 </div>
