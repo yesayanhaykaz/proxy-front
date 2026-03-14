@@ -19,7 +19,9 @@ export default function HomePage() {
       <Hero />
       <TrustBar />
       <FeatureCards />
+
       <ChooseAndBuy />
+
       <Locations />
       <PopularPackages />
       <WhyChooseGrid />
