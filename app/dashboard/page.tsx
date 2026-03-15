@@ -33,17 +33,22 @@ function pct(used: number, total: number) {
 }
 
 function mapPurchase(p: Purchase): Sub {
+  const type =
+    p.category === "residential"
+      ? "Residential"
+      : p.category === "mobile"
+      ? "Mobile"
+      : p.category === "datacenter"
+      ? "Datacenter"
+      : "Fast";
+
   return {
     id: p.purchase_id,
     planName: p.package_name,
-    type: p.category,
+    type,
     status: p.status === "active" ? "Active" : "Expired",
     renewsOn: new Date(p.created_at).toLocaleDateString(),
-    usage: {
-      used: 0,
-      total: 5,
-      unit: "GB",
-    },
+    usage: { used: 0, total: 5, unit: "GB" },
     location: "Global",
   };
 }
