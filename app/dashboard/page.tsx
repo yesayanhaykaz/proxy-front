@@ -33,14 +33,26 @@ function pct(used: number, total: number) {
 }
 
 function mapPurchase(p: Purchase): Sub {
-  const type =
-    p.category === "residential"
-      ? "Residential"
-      : p.category === "mobile"
-      ? "Mobile"
-      : p.category === "datacenter"
-      ? "Datacenter"
-      : "Fast";
+  const cat = (p.category || "").toLowerCase();
+
+  let type: Sub["type"];
+
+  switch (cat) {
+    case "residential":
+      type = "Residential";
+      break;
+    case "mobile":
+      type = "Mobile";
+      break;
+    case "datacenter":
+      type = "Datacenter";
+      break;
+    case "fast":
+      type = "Fast";
+      break;
+    default:
+      type = "Residential";
+  }
 
   return {
     id: p.purchase_id,
