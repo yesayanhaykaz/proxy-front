@@ -104,7 +104,7 @@ export async function POST(req: Request) {
 
     // Success — redirect to dashboard
     const host  = req.headers.get("host") || "localhost:3000";
-    const proto = process.env.NODE_ENV === "production" ? "https" : "http";
+    const proto = "https";
     return NextResponse.redirect(`${proto}://${host}/dashboard`);
 
   } catch (err) {
