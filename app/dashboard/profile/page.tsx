@@ -2,6 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
 
+const cookieStore = cookies();
+
+const user = {
+  name: "User",
+  email: decodeURIComponent(cookieStore.get("ps_email")?.value || ""),
+  company: "",
+  country: "",
+  city: "",
+  timezone: "UTC",
+};
+
 export const metadata: Metadata = {
   title: "Profile | Proxiesseller Dashboard",
   description: "Manage your account profile, password, and security settings.",
