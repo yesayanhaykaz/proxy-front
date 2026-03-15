@@ -5,8 +5,8 @@ import { cookies } from "next/headers";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Billing | ProxiesSeller",
-  description: "Manage your plan, invoices, and payment methods.",
+  title: "Billing & History | ProxiesSeller",
+  description: "Manage your plan, invoices, and transaction history.",
   robots: { index: false, follow: false },
 };
 
@@ -30,162 +30,207 @@ async function getPurchases(userId: string): Promise<Purchase[]> {
   return data.purchases || [];
 }
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    year: "numeric", month: "short", day: "numeric",
-  });
-}
-
-function formatAmount(cents: number) {
+function fmt(cents: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 }
 
-export default async function BillingPage() {
+function fmtDate(str: string) {
+  return new Date(str).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+}
+
+function fmtTime(str: string) {
+  return new Date(str).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+}
+
+const CAT_BADGE: Record<string, string> = {
+  residential: "bg-violet-100 text-violet-700 border-violet-200",
+  mobile:      "bg-emerald-100 text-emerald-700 border-emerald-200",
+  datacenter:  "bg-sky-100 text-sky-700 border-sky-200",
+  fast:        "bg-amber-100 text-amber-700 border-amber-200",
+};
+
+export default async function BillingHistoryPage() {
   const cookieStore = cookies();
-  const userId = cookieStore.get("ps_uid")?.value || "";
+  const userId   = cookieStore.get("ps_uid")?.value || "";
   const purchases = await getPurchases(userId);
-  const lastPlan = purchases[0];
-  const totalSpent = purchases.reduce((sum, p) => sum + (p.price_cents || 0), 0);
+  const latest   = purchases[0];
+  const totalSpent = purchases.reduce((s, p) => s + (p.price_cents || 0), 0);
+  const activeCount = purchases.filter((p) => p.status === "active").length;
+
+  // Group by month for history section
+  const grouped: Record<string, Purchase[]> = {};
+  purchases.forEach((p) => {
+    const k = new Date(p.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long" });
+    (grouped[k] ??= []).push(p);
+  });
 
   return (
-    <div className="min-h-screen bg-[#0a0b0f] text-white font-['Sora',sans-serif]">
+    <div className="min-h-screen bg-slate-50 font-['Sora',sans-serif] text-slate-900">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
-        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-        .fade-up { animation: fadeUp 0.35s ease both; }
-        .card-hover { transition: background 0.2s; }
-        .card-hover:hover { background: rgba(255,255,255,0.04); }
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
         .mono { font-family: 'JetBrains Mono', monospace; }
-        .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.25); margin-bottom: 20px; }
-        .status-active { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); color: #6ee7b7; border-radius: 100px; padding: 4px 12px; font-size: 11px; font-weight: 700; }
-        .status-expired { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); border-radius: 100px; padding: 4px 12px; font-size: 11px; font-weight: 700; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .fu  { animation: fadeUp .4s ease both; }
+        .fu1 { animation-delay:.06s; }
+        .fu2 { animation-delay:.12s; }
+        .fu3 { animation-delay:.18s; }
+        .row:hover { background: #f8fafc; }
+        .card { transition: box-shadow .2s, transform .2s; }
+        .card:hover { box-shadow: 0 6px 24px rgba(0,0,0,.07); transform: translateY(-1px); }
       `}</style>
 
-      {/* Header */}
-      <header className="border-b border-white/5 px-6 py-4">
-        <div className="mx-auto max-w-5xl flex items-center justify-between">
+      {/* Navbar */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-20">
+        <div className="mx-auto max-w-5xl px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm">
-            <Link href="/dashboard" className="text-white/40 hover:text-white transition-colors font-medium">Dashboard</Link>
-            <span className="text-white/20">/</span>
-            <span className="text-white/80 font-semibold">Billing</span>
+            <Link href="/dashboard" className="text-slate-400 hover:text-slate-900 transition-colors font-semibold">Dashboard</Link>
+            <span className="text-slate-300">/</span>
+            <span className="text-slate-800 font-semibold">Billing & History</span>
           </div>
-          <Link href="/pricing" className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-xl px-4 py-2 text-sm font-bold hover:opacity-90 transition-opacity">
+          <Link href="/pricing" className="inline-flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl px-4 py-2 text-sm font-bold transition-colors">
             Upgrade plan →
           </Link>
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 py-10 space-y-6">
+      <main className="mx-auto max-w-5xl px-4 py-10 space-y-8">
 
-        {/* Heading */}
-        <div className="fade-up">
-          <h1 className="text-3xl font-extrabold tracking-tight">Billing</h1>
-          <p className="mt-1 text-sm text-white/40">Manage your plan and view invoices</p>
+        {/* Page title */}
+        <div className="fu">
+          <h1 className="text-3xl font-extrabold tracking-tight">Billing &amp; History</h1>
+          <p className="mt-1 text-sm text-slate-400">Your current plan and full transaction record</p>
         </div>
 
-        {/* Stats row */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 fade-up">
-          <div className="glass rounded-2xl p-5">
-            <p className="text-[11px] text-white/30 uppercase tracking-wider font-bold mb-2">Total spent</p>
-            <p className="text-2xl font-extrabold mono">{formatAmount(totalSpent)}</p>
-          </div>
-          <div className="glass rounded-2xl p-5">
-            <p className="text-[11px] text-white/30 uppercase tracking-wider font-bold mb-2">Total orders</p>
-            <p className="text-2xl font-extrabold">{purchases.length}</p>
-          </div>
-          <div className="glass rounded-2xl p-5 col-span-2 md:col-span-1">
-            <p className="text-[11px] text-white/30 uppercase tracking-wider font-bold mb-2">Active plans</p>
-            <p className="text-2xl font-extrabold">{purchases.filter(p => p.status === "active").length}</p>
-          </div>
+        {/* Summary stats */}
+        <div className="grid grid-cols-3 gap-4 fu fu1">
+          {[
+            { label: "Total Spent",    value: fmt(totalSpent),      accent: "text-slate-900" },
+            { label: "Total Orders",   value: String(purchases.length), accent: "text-slate-900" },
+            { label: "Active Plans",   value: String(activeCount),  accent: "text-emerald-600" },
+          ].map((s) => (
+            <div key={s.label} className="bg-white rounded-2xl border border-slate-200 p-5 card">
+              <div className={`text-2xl font-extrabold mono ${s.accent}`}>{s.value}</div>
+              <div className="text-xs text-slate-400 mt-1 font-medium">{s.label}</div>
+            </div>
+          ))}
         </div>
 
-        {/* Current plan */}
-        {lastPlan && (
-          <div className="relative overflow-hidden glass rounded-3xl p-6 fade-up">
-            {/* Decorative glow */}
-            <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-violet-600/20 blur-3xl pointer-events-none" />
-            <div className="relative">
-              <p className="section-label">Current Plan</p>
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <h2 className="text-xl font-extrabold">{lastPlan.package_name}</h2>
-                    <span className={lastPlan.status === "active" ? "status-active" : "status-expired"}>
-                      {lastPlan.status === "active" ? "Active" : "Expired"}
-                    </span>
-                  </div>
-                  <p className="text-sm text-white/40">Activated {formatDate(lastPlan.created_at)}</p>
-                  <p className="text-sm text-white/40 mt-1 mono">{lastPlan.category}</p>
+        {/* Current plan card */}
+        {latest && (
+          <div className="relative overflow-hidden bg-white rounded-3xl border border-slate-200 p-6 shadow-sm fu fu2">
+            {/* Decorative accent strip */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-indigo-500 rounded-t-3xl" />
+            <div className="flex items-start justify-between gap-4 mt-1">
+              <div>
+                <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-2">Current Plan</p>
+                <div className="flex items-center gap-3 mb-2">
+                  <h2 className="text-xl font-extrabold">{latest.package_name}</h2>
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold border ${
+                    latest.status === "active"
+                      ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                      : "bg-slate-100 text-slate-400 border-slate-200"
+                  }`}>
+                    {latest.status === "active" && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+                    {latest.status === "active" ? "Active" : "Expired"}
+                  </span>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="text-3xl font-extrabold mono">{formatAmount(lastPlan.price_cents)}</p>
-                  <p className="text-xs text-white/30 mt-1">one-time</p>
-                </div>
+                <p className="text-sm text-slate-400">Activated {fmtDate(latest.created_at)}</p>
+                {latest.category && (
+                  <span className={`inline-flex mt-2 rounded-full border px-2.5 py-1 text-[11px] font-bold ${CAT_BADGE[(latest.category || "").toLowerCase()] || "bg-slate-100 text-slate-500 border-slate-200"}`}>
+                    {latest.category}
+                  </span>
+                )}
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-3xl font-extrabold mono">{fmt(latest.price_cents)}</p>
+                <p className="text-xs text-slate-400 mt-1">one-time</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Invoices */}
-        <div className="glass rounded-3xl overflow-hidden fade-up">
-          <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between">
+        {/* Transaction history */}
+        <div className="fu fu3">
+          <div className="flex items-center justify-between mb-5">
             <div>
-              <p className="font-bold text-base">Invoices</p>
-              <p className="text-xs text-white/40 mt-0.5">{purchases.length} total transactions</p>
+              <h2 className="text-lg font-extrabold">Transaction History</h2>
+              <p className="text-xs text-slate-400 mt-0.5">{purchases.length} transactions</p>
             </div>
             {purchases.length > 0 && (
-              <button className="text-xs text-violet-400 hover:text-violet-300 font-semibold transition-colors">
+              <button className="text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors border border-slate-200 rounded-lg px-3 py-1.5 bg-white">
                 Export CSV
               </button>
             )}
           </div>
 
           {purchases.length === 0 ? (
-            <div className="py-16 text-center">
-              <div className="text-4xl mb-3 opacity-20">◈</div>
-              <p className="text-sm text-white/30">No invoices yet</p>
+            <div className="bg-white rounded-3xl border border-slate-200 p-16 text-center">
+              <p className="text-slate-400 text-sm">No transactions yet</p>
             </div>
           ) : (
-            <div className="divide-y divide-white/5">
-              {/* Table header */}
-              <div className="grid grid-cols-12 px-6 py-3 text-[11px] text-white/25 font-bold uppercase tracking-wider">
-                <span className="col-span-5">Plan</span>
-                <span className="col-span-3">Category</span>
-                <span className="col-span-2">Date</span>
-                <span className="col-span-1 text-center">Status</span>
-                <span className="col-span-1 text-right">Amount</span>
-              </div>
-              {purchases.map((p, i) => (
-                <div
-                  key={p.purchase_id}
-                  className="grid grid-cols-12 items-center px-6 py-4 card-hover transition-colors"
-                  style={{ animationDelay: `${i * 0.04}s` }}
-                >
-                  <div className="col-span-5">
-                    <p className="font-semibold text-sm truncate pr-4">{p.package_name}</p>
-                    <p className="text-[11px] mono text-white/25 mt-0.5 truncate">{p.purchase_id.slice(0, 12)}…</p>
-                  </div>
-                  <div className="col-span-3">
-                    <span className="text-xs text-white/50 bg-white/5 border border-white/8 rounded-lg px-2 py-1">{p.category || "—"}</span>
-                  </div>
-                  <div className="col-span-2">
-                    <p className="text-sm text-white/50">{formatDate(p.created_at)}</p>
-                  </div>
-                  <div className="col-span-1 flex justify-center">
-                    <span className={p.status === "active" ? "status-active" : "status-expired"}>
-                      {p.status === "active" ? "Active" : "Exp."}
+            <div className="space-y-6">
+              {Object.entries(grouped).map(([month, items]) => (
+                <div key={month}>
+                  {/* Month separator */}
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">{month}</span>
+                    <div className="flex-1 h-px bg-slate-200" />
+                    <span className="text-[11px] text-slate-400 mono font-medium">
+                      {fmt(items.reduce((s, p) => s + (p.price_cents || 0), 0))}
                     </span>
                   </div>
-                  <div className="col-span-1 text-right">
-                    <p className="font-bold mono text-sm">{formatAmount(p.price_cents)}</p>
+
+                  <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                    {/* Table head */}
+                    <div className="grid grid-cols-12 px-5 py-3 border-b border-slate-100 text-[11px] text-slate-400 font-extrabold uppercase tracking-wider">
+                      <span className="col-span-5">Plan</span>
+                      <span className="col-span-2">Type</span>
+                      <span className="col-span-2 hidden sm:block">Date</span>
+                      <span className="col-span-2 text-center">Status</span>
+                      <span className="col-span-1 text-right">Amount</span>
+                    </div>
+                    {items.map((p, i) => {
+                      const catKey = (p.category || "").toLowerCase();
+                      const badgeCls = CAT_BADGE[catKey] || "bg-slate-100 text-slate-500 border-slate-200";
+                      return (
+                        <div
+                          key={p.purchase_id}
+                          className={`row grid grid-cols-12 items-center px-5 py-3.5 transition-colors ${i < items.length - 1 ? "border-b border-slate-50" : ""}`}
+                        >
+                          <div className="col-span-5 min-w-0">
+                            <p className="font-semibold text-sm text-slate-900 truncate pr-3">{p.package_name}</p>
+                            <p className="text-[10px] mono text-slate-300 mt-0.5 truncate">{p.purchase_id.slice(0, 14)}…</p>
+                          </div>
+                          <div className="col-span-2">
+                            <span className={`inline-flex rounded-full border px-2 py-0.5 text-[11px] font-bold ${badgeCls}`}>
+                              {p.category || "—"}
+                            </span>
+                          </div>
+                          <div className="col-span-2 hidden sm:block">
+                            <p className="text-sm text-slate-500">{fmtDate(p.created_at)}</p>
+                            <p className="text-[10px] text-slate-300 mono">{fmtTime(p.created_at)}</p>
+                          </div>
+                          <div className="col-span-2 flex justify-center">
+                            {p.status === "active" ? (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 border border-emerald-200 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />Active
+                              </span>
+                            ) : (
+                              <span className="inline-flex rounded-full bg-slate-100 border border-slate-200 px-2.5 py-1 text-[11px] font-bold text-slate-400">Expired</span>
+                            )}
+                          </div>
+                          <div className="col-span-1 text-right">
+                            <span className="font-extrabold mono text-sm text-slate-900">{fmt(p.price_cents)}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-
       </main>
     </div>
   );
