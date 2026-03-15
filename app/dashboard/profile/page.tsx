@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Profile | Proxiesseller Dashboard",
@@ -84,15 +85,17 @@ function Divider() {
 
 export default function ProfilePage() {
   // TODO: Replace with real data from your auth/session
-  const user = {
-    name: "John Doe",
-    email: "john@example.com",
-    company: "Acme Inc.",
-    country: "United States",
-    city: "New York",
-    timezone: "America/New_York",
-  };
 
+const cookieStore = cookies();
+
+const user = {
+  name: "User",
+  email: decodeURIComponent(cookieStore.get("ps_email")?.value || ""),
+  company: "",
+  country: "",
+  city: "",
+  timezone: "UTC",
+};
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
