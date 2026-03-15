@@ -62,13 +62,13 @@ export function Hero() {
     View Docs
   </Link>
 
-  <Link
-    href="/proxy-builder"
-    className="inline-flex items-center justify-center rounded-2xl bg-emerald-500 px-7 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-  >
-    Buy With 1 Click
-    <span className="ml-2 text-white/80">⚡</span>
-  </Link>
+<Link
+  href="/proxy-builder"
+  className="group relative inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-500 px-7 py-3 text-sm font-extrabold text-white shadow-lg shadow-indigo-500/30 transition hover:scale-[1.03] hover:from-sky-400 hover:to-indigo-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+>
+  Build Your Proxy
+  <span className="ml-2 transition-transform group-hover:translate-x-1">→</span>
+</Link>
 </div>
 
           {/* Trust stats (more premium) */}
