@@ -6,10 +6,16 @@ export async function POST(req: Request) {
   try {
 
     const jar = cookies();
-    const email = jar.get("ps_session")?.value || "";
 
-    if (!email) {
-      return NextResponse.json({ error: "not_logged_in" }, { status: 401 });
+    // cookie format: user_id:email:hash
+    const raw = jar.get("ps_email")?.value || "";
+    const userId = raw.split(":")[0];
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "not_logged_in" },
+        { status: 401 }
+      );
     }
 
     const form = await req.formData();
@@ -21,10 +27,8 @@ export async function POST(req: Request) {
     const country = form.get("country");
     const traffic = form.get("traffic");
 
-    const backendUrl = `${process.env.API_BASE}/order`;
-
     console.log("Creating order:", {
-      email,
+      user_id: userId,
       plan,
       network,
       session,
@@ -33,13 +37,13 @@ export async function POST(req: Request) {
       traffic
     });
 
-    const r = await fetch(backendUrl, {
+    const r = await fetch(`${process.env.API_BASE}/order`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        email,
+        user_id: userId,
         package_id: plan,
         network,
         session,
@@ -50,19 +54,28 @@ export async function POST(req: Request) {
     });
 
     const data = await r.text();
+
     console.log("Backend response:", data);
 
     const host = req.headers.get("host");
     const proto = req.headers.get("x-forwarded-proto") || "https";
 
-    return NextResponse.redirect(`${proto}://${host}/dashboard`, 303);
+    return NextResponse.redirect(
+      `${proto}://${host}/dashboard`,
+      303
+    );
 
   } catch (e) {
 
-    return NextResponse.json({
-      error: "checkout_failed",
-      detail: String(e)
-    }, { status: 500 });
+    console.error("Checkout error:", e);
+
+    return NextResponse.json(
+      {
+        error: "checkout_failed",
+        detail: String(e)
+      },
+      { status: 500 }
+    );
 
   }
 
