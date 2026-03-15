@@ -3,6 +3,8 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { CheckoutAuthPanel } from "@/components/checkout/CheckoutAuthPanel";
 import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
+
 
 export const metadata: Metadata = {
   title: "Checkout — ProxiesSeller",
@@ -153,10 +155,12 @@ export default async function CheckoutPage({
   traffic?: string;
 }
 }) {
-  const planId = searchParams.plan ? String(searchParams.plan) : "";
-  const isCustom = searchParams.plan === "custom";
+const planId = searchParams.plan ? String(searchParams.plan) : "";
+const isCustom = planId === "custom";
 
-  const mode = searchParams.mode === "login" ? "login" : "register";
+if (isCustom && (!searchParams.network || !searchParams.protocol)) {
+  redirect("/builder");
+}
 
 let plan = null;
 
