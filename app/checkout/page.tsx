@@ -159,7 +159,7 @@ const planId = searchParams.plan ? String(searchParams.plan) : "";
 const isCustom = planId === "custom";
 
 if (isCustom && (!searchParams.network || !searchParams.protocol)) {
-  redirect("/builder");
+  redirect("/proxy-builder");
 }
 
 let plan = null;
@@ -282,7 +282,6 @@ if (isCustom) {
 ) : (
   <CheckoutAuthPanel
     planId={String(plan.id)}
-    initialMode={mode}
     next={nextUrl}
   />
 )}
