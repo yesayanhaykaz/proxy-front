@@ -49,11 +49,13 @@ export default function ProxyBuilderPage() {
       network, session, protocol, location, country,
       traffic: String(traffic),
     });
+    const checkoutUrl = `/checkout?${params.toString()}`;
     if (!isLoggedIn) {
-      router.push(`/auth/login?next=/checkout?${params.toString()}`);
+      // Encode the full checkout URL so the inner `?` doesn't break the `next` param
+      router.push(`/auth/login?next=${encodeURIComponent(checkoutUrl)}`);
       return;
     }
-    router.push(`/checkout?${params.toString()}`);
+    router.push(checkoutUrl);
   };
 
   const meta = NETWORK_META[network];

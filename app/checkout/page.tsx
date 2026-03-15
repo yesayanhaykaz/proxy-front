@@ -171,7 +171,8 @@ export default async function CheckoutPage({
     return n.includes("session") || n.includes("auth") || n.includes("token") || n.includes("jwt");
   });
   const isAuthed    = Boolean(session) || hasAuthCookie;
-  const nextUrl     = `/checkout?${new URLSearchParams(searchParams as any).toString()}`;
+  // encode so the inner `?` does not break whatever login page uses `next` as a query param
+  const nextUrl     = encodeURIComponent(`/checkout?${new URLSearchParams(searchParams as any).toString()}`);
   const networkIcon = NETWORK_ICON[(searchParams.network || "").toLowerCase()] || "fa-layer-group";
 
   return (
