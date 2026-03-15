@@ -69,33 +69,21 @@ async function getSubscriptions(userId: string): Promise<Sub[]> {
   if (!userId) return [];
 
   try {
-    const res = await fetch(`${process.env.API_URL}/api/purchases`, {
+    const res = await fetch("https://api.proxiesseller.cc/api/purchases", {
       headers: {
         "X-User-Id": userId,
-        "Content-Type": "application/json",
       },
       cache: "no-store",
     });
 
-    if (!res.ok) {
-      console.error("Dashboard API error:", res.status);
-      return [];
-    }
+    if (!res.ok) return [];
 
     const data = await res.json();
 
-    console.log("Dashboard purchases response:", data);
-
-    // support multiple backend formats
-    let purchases: Purchase[] = [];
-
-    if (Array.isArray(data)) purchases = data;
-    else if (Array.isArray(data.purchases)) purchases = data.purchases;
-    else if (Array.isArray(data.data)) purchases = data.data;
+    const purchases: Purchase[] = data.purchases || [];
 
     return purchases.map(mapPurchase);
-  } catch (e) {
-    console.error("Dashboard fetch error:", e);
+  } catch {
     return [];
   }
 }
