@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
@@ -25,11 +24,10 @@ export default function SettingsPage() {
         .fu3 { animation-delay:.18s; }
         .fu4 { animation-delay:.24s; }
 
-        .section-card { background:#fff; border-radius:24px; border:1.5px solid #e2e8f0; padding:28px; }
-        .section-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8; margin-bottom:18px; }
+        .card { background:#fff; border-radius:24px; border:1.5px solid #e2e8f0; padding:28px; }
         .divider { height:1px; background:#f1f5f9; }
 
-        /* Toggle */
+        /* Toggle switch */
         .toggle-wrap { position:relative; display:inline-block; width:44px; height:26px; flex-shrink:0; }
         .toggle-wrap input { opacity:0; width:0; height:0; }
         .toggle-track {
@@ -39,8 +37,8 @@ export default function SettingsPage() {
         }
         .toggle-track::after {
           content:''; position:absolute; top:3px; left:3px;
-          width:16px; height:16px; border-radius:50%; background:#fff;
-          box-shadow:0 1px 3px rgba(0,0,0,.15);
+          width:16px; height:16px; border-radius:50%;
+          background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.15);
           transition:transform .2s;
         }
         .toggle-wrap input:checked + .toggle-track { background:#7c3aed; border-color:#7c3aed; }
@@ -64,31 +62,13 @@ export default function SettingsPage() {
         .btn-primary:hover  { background:#6d28d9; }
         .btn-primary:active { transform:scale(.97); }
 
-        .btn-secondary {
-          display:inline-flex; align-items:center; gap:6px;
-          background:#fff; border:1.5px solid #e2e8f0; border-radius:10px;
-          padding:8px 14px; font-size:12px; font-weight:600; color:#475569;
-          cursor:pointer; transition:background .15s; font-family:'Sora',sans-serif;
-        }
-        .btn-secondary:hover { background:#f8fafc; }
-
         .row-item { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 0; }
-        .row-item + .row-item { border-top: 1px solid #f1f5f9; }
+        .row-item + .row-item { border-top:1px solid #f1f5f9; }
         .row-label { font-size:14px; font-weight:600; color:#0f172a; }
         .row-desc  { font-size:12px; color:#94a3b8; margin-top:2px; }
       `}</style>
 
-      {/* Navbar */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div className="mx-auto max-w-4xl px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm">
-            <Link href="/dashboard" className="text-slate-400 hover:text-slate-900 transition-colors font-semibold">Dashboard</Link>
-            <span className="text-slate-300">/</span>
-            <span className="text-slate-800 font-semibold">Settings</span>
-          </div>
-          <Link href="/dashboard" className="btn-secondary">← Back</Link>
-        </div>
-      </header>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
       <main className="mx-auto max-w-4xl px-4 py-10 space-y-5">
 
@@ -99,8 +79,10 @@ export default function SettingsPage() {
         </div>
 
         {/* Account info */}
-        <div className="section-card fu fu1">
-          <p className="section-title">Account</p>
+        <div className="card fu fu1">
+          <h2 className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+            <i className="fa-solid fa-circle-user text-slate-300" />Account
+          </h2>
           <div className="flex items-center gap-4">
             <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-lg font-extrabold shadow-md shadow-violet-100 shrink-0">
               {email[0]?.toUpperCase()}
@@ -110,25 +92,31 @@ export default function SettingsPage() {
               <p className="text-xs text-slate-400 mt-0.5">Logged-in account · read-only</p>
             </div>
             <span className="ml-auto shrink-0 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1.5 text-xs font-bold text-emerald-700">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Active
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />Active
             </span>
           </div>
         </div>
 
         {/* Notifications */}
-        <div className="section-card fu fu2">
-          <p className="section-title">Notifications</p>
+        <div className="card fu fu2">
+          <h2 className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+            <i className="fa-solid fa-bell text-slate-300" />Notifications
+          </h2>
           {[
-            { id: "n1", label: "Proxy activation",  desc: "Email when a proxy plan is successfully activated",  on: true  },
-            { id: "n2", label: "Invoice emails",     desc: "Receive a receipt after every successful purchase",  on: true  },
-            { id: "n3", label: "Expiry reminders",   desc: "Alert me 3 days before a proxy plan expires",       on: false },
-            { id: "n4", label: "Product updates",    desc: "News about new proxy types, features, promotions",  on: false },
+            { id: "n1", label: "Proxy activation",  desc: "Email when a proxy plan is successfully activated",  icon: "fa-network-wired", on: true  },
+            { id: "n2", label: "Invoice emails",     desc: "Receive a receipt after every successful purchase",  icon: "fa-receipt",       on: true  },
+            { id: "n3", label: "Expiry reminders",   desc: "Alert me 3 days before a proxy plan expires",       icon: "fa-clock",         on: false },
+            { id: "n4", label: "Product updates",    desc: "News about new proxy types, features, promotions",  icon: "fa-bullhorn",      on: false },
           ].map((item) => (
             <label key={item.id} htmlFor={item.id} className="row-item cursor-pointer">
-              <div>
-                <p className="row-label">{item.label}</p>
-                <p className="row-desc">{item.desc}</p>
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                  <i className={`fa-solid ${item.icon} text-slate-400 text-[11px]`} />
+                </div>
+                <div>
+                  <p className="row-label">{item.label}</p>
+                  <p className="row-desc">{item.desc}</p>
+                </div>
               </div>
               <label className="toggle-wrap">
                 <input id={item.id} type="checkbox" defaultChecked={item.on} />
@@ -139,12 +127,20 @@ export default function SettingsPage() {
         </div>
 
         {/* Appearance */}
-        <div className="section-card fu fu3">
-          <p className="section-title">Appearance</p>
+        <div className="card fu fu3">
+          <h2 className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+            <i className="fa-solid fa-palette text-slate-300" />Appearance
+          </h2>
+
           <div className="row-item">
-            <div>
-              <p className="row-label">Theme</p>
-              <p className="row-desc">Dashboard color scheme</p>
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                <i className="fa-solid fa-sun text-slate-400 text-[11px]" />
+              </div>
+              <div>
+                <p className="row-label">Theme</p>
+                <p className="row-desc">Dashboard color scheme</p>
+              </div>
             </div>
             <div className="relative">
               <select className="field-select">
@@ -152,18 +148,24 @@ export default function SettingsPage() {
                 <option>Dark</option>
                 <option>System</option>
               </select>
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">▾</span>
+              <i className="fa-solid fa-chevron-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]" />
             </div>
           </div>
+
           {[
-            { id: "compact",   label: "Compact mode",           desc: "Reduce spacing in lists and tables",                  on: false },
-            { id: "bandwidth", label: "Show bandwidth usage",   desc: "Display progress bars on subscription cards",         on: true  },
-            { id: "tooltips",  label: "Show tooltips",          desc: "Helpful hints throughout the dashboard",              on: true  },
+            { id: "compact",   label: "Compact mode",         desc: "Reduce spacing in lists and tables",          icon: "fa-compress",   on: false },
+            { id: "bandwidth", label: "Show bandwidth usage", desc: "Display progress bars on subscription cards", icon: "fa-chart-bar",  on: true  },
+            { id: "tooltips",  label: "Show tooltips",        desc: "Helpful hints throughout the dashboard",      icon: "fa-circle-info",on: true  },
           ].map((item) => (
             <label key={item.id} htmlFor={item.id} className="row-item cursor-pointer">
-              <div>
-                <p className="row-label">{item.label}</p>
-                <p className="row-desc">{item.desc}</p>
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                  <i className={`fa-solid ${item.icon} text-slate-400 text-[11px]`} />
+                </div>
+                <div>
+                  <p className="row-label">{item.label}</p>
+                  <p className="row-desc">{item.desc}</p>
+                </div>
               </div>
               <label className="toggle-wrap">
                 <input id={item.id} type="checkbox" defaultChecked={item.on} />
@@ -174,8 +176,10 @@ export default function SettingsPage() {
         </div>
 
         {/* Region & Language */}
-        <div className="section-card fu fu4">
-          <p className="section-title">Region &amp; Language</p>
+        <div className="card fu fu4">
+          <h2 className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+            <i className="fa-solid fa-globe text-slate-300" />Region &amp; Language
+          </h2>
           <div className="grid sm:grid-cols-2 gap-5">
             <div>
               <label className="block text-xs font-bold text-slate-500 mb-2">Language</label>
@@ -187,7 +191,7 @@ export default function SettingsPage() {
                   <option>French</option>
                   <option>Spanish</option>
                 </select>
-                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">▾</span>
+                <i className="fa-solid fa-chevron-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]" />
               </div>
             </div>
             <div>
@@ -198,14 +202,18 @@ export default function SettingsPage() {
                   <option>EUR (€)</option>
                   <option>GBP (£)</option>
                 </select>
-                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">▾</span>
+                <i className="fa-solid fa-chevron-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]" />
               </div>
             </div>
           </div>
           <div className="divider mt-6 mb-5" />
           <div className="flex items-center justify-between">
-            <p className="text-xs text-slate-400">Changes apply immediately after saving</p>
-            <button type="button" className="btn-primary">Save settings →</button>
+            <p className="text-xs text-slate-400">
+              <i className="fa-solid fa-circle-info mr-1 text-slate-300" />Changes apply immediately after saving
+            </p>
+            <button type="button" className="btn-primary">
+              <i className="fa-solid fa-floppy-disk text-xs" />Save settings
+            </button>
           </div>
         </div>
 

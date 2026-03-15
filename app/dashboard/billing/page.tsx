@@ -33,11 +33,9 @@ async function getPurchases(userId: string): Promise<Purchase[]> {
 function fmt(cents: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 }
-
 function fmtDate(str: string) {
   return new Date(str).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
-
 function fmtTime(str: string) {
   return new Date(str).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 }
@@ -51,13 +49,12 @@ const CAT_BADGE: Record<string, string> = {
 
 export default async function BillingHistoryPage() {
   const cookieStore = cookies();
-  const userId   = cookieStore.get("ps_uid")?.value || "";
-  const purchases = await getPurchases(userId);
-  const latest   = purchases[0];
+  const userId     = cookieStore.get("ps_uid")?.value || "";
+  const purchases  = await getPurchases(userId);
+  const latest     = purchases[0];
   const totalSpent = purchases.reduce((s, p) => s + (p.price_cents || 0), 0);
   const activeCount = purchases.filter((p) => p.status === "active").length;
 
-  // Group by month for history section
   const grouped: Record<string, Purchase[]> = {};
   purchases.forEach((p) => {
     const k = new Date(p.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long" });
@@ -74,24 +71,12 @@ export default async function BillingHistoryPage() {
         .fu1 { animation-delay:.06s; }
         .fu2 { animation-delay:.12s; }
         .fu3 { animation-delay:.18s; }
-        .row:hover { background: #f8fafc; }
         .card { transition: box-shadow .2s, transform .2s; }
         .card:hover { box-shadow: 0 6px 24px rgba(0,0,0,.07); transform: translateY(-1px); }
+        .row:hover { background: #f8fafc; }
       `}</style>
 
-      {/* Navbar */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div className="mx-auto max-w-5xl px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm">
-            <Link href="/dashboard" className="text-slate-400 hover:text-slate-900 transition-colors font-semibold">Dashboard</Link>
-            <span className="text-slate-300">/</span>
-            <span className="text-slate-800 font-semibold">Billing & History</span>
-          </div>
-          <Link href="/pricing" className="inline-flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl px-4 py-2 text-sm font-bold transition-colors">
-            Upgrade plan →
-          </Link>
-        </div>
-      </header>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
       <main className="mx-auto max-w-5xl px-4 py-10 space-y-8">
 
@@ -104,46 +89,57 @@ export default async function BillingHistoryPage() {
         {/* Summary stats */}
         <div className="grid grid-cols-3 gap-4 fu fu1">
           {[
-            { label: "Total Spent",    value: fmt(totalSpent),      accent: "text-slate-900" },
-            { label: "Total Orders",   value: String(purchases.length), accent: "text-slate-900" },
-            { label: "Active Plans",   value: String(activeCount),  accent: "text-emerald-600" },
+            { label: "Total Spent",  value: fmt(totalSpent),        icon: "fa-wallet",       accent: "text-slate-700",   bg: "bg-slate-100",  border: "border-slate-200"  },
+            { label: "Total Orders", value: String(purchases.length), icon: "fa-receipt",    accent: "text-slate-700",   bg: "bg-slate-100",  border: "border-slate-200"  },
+            { label: "Active Plans", value: String(activeCount),    icon: "fa-circle-check",  accent: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100"},
           ].map((s) => (
             <div key={s.label} className="bg-white rounded-2xl border border-slate-200 p-5 card">
+              <div className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${s.bg} border ${s.border} mb-3`}>
+                <i className={`fa-solid ${s.icon} ${s.accent} text-sm`} />
+              </div>
               <div className={`text-2xl font-extrabold mono ${s.accent}`}>{s.value}</div>
               <div className="text-xs text-slate-400 mt-1 font-medium">{s.label}</div>
             </div>
           ))}
         </div>
 
-        {/* Current plan card */}
+        {/* Current plan */}
         {latest && (
-          <div className="relative overflow-hidden bg-white rounded-3xl border border-slate-200 p-6 shadow-sm fu fu2">
-            {/* Decorative accent strip */}
+          <div className="relative overflow-hidden bg-white rounded-3xl border border-slate-200 shadow-sm fu fu2">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-indigo-500 rounded-t-3xl" />
-            <div className="flex items-start justify-between gap-4 mt-1">
-              <div>
-                <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-2">Current Plan</p>
-                <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-xl font-extrabold">{latest.package_name}</h2>
-                  <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold border ${
-                    latest.status === "active"
-                      ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                      : "bg-slate-100 text-slate-400 border-slate-200"
-                  }`}>
-                    {latest.status === "active" && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
-                    {latest.status === "active" ? "Active" : "Expired"}
-                  </span>
+            <div className="p-6 pt-7">
+              <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-1.5">
+                <i className="fa-solid fa-star text-violet-400" />Current Plan
+              </p>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h2 className="text-xl font-extrabold">{latest.package_name}</h2>
+                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold border ${
+                      latest.status === "active"
+                        ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                        : "bg-slate-100 text-slate-400 border-slate-200"
+                    }`}>
+                      {latest.status === "active" && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+                      {latest.status === "active" ? "Active" : "Expired"}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-400 flex items-center gap-1.5">
+                    <i className="fa-regular fa-calendar text-slate-300" />Activated {fmtDate(latest.created_at)}
+                  </p>
+                  {latest.category && (
+                    <span className={`inline-flex mt-2 rounded-full border px-2.5 py-1 text-[11px] font-bold ${CAT_BADGE[(latest.category || "").toLowerCase()] || "bg-slate-100 text-slate-500 border-slate-200"}`}>
+                      {latest.category}
+                    </span>
+                  )}
                 </div>
-                <p className="text-sm text-slate-400">Activated {fmtDate(latest.created_at)}</p>
-                {latest.category && (
-                  <span className={`inline-flex mt-2 rounded-full border px-2.5 py-1 text-[11px] font-bold ${CAT_BADGE[(latest.category || "").toLowerCase()] || "bg-slate-100 text-slate-500 border-slate-200"}`}>
-                    {latest.category}
-                  </span>
-                )}
-              </div>
-              <div className="text-right shrink-0">
-                <p className="text-3xl font-extrabold mono">{fmt(latest.price_cents)}</p>
-                <p className="text-xs text-slate-400 mt-1">one-time</p>
+                <div className="text-right shrink-0">
+                  <p className="text-3xl font-extrabold mono">{fmt(latest.price_cents)}</p>
+                  <p className="text-xs text-slate-400 mt-1">one-time</p>
+                  <Link href="/pricing" className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-violet-600 hover:text-violet-700 transition-colors">
+                    <i className="fa-solid fa-arrow-up-right-from-square text-[10px]" />Upgrade
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -154,28 +150,30 @@ export default async function BillingHistoryPage() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="text-lg font-extrabold">Transaction History</h2>
-              <p className="text-xs text-slate-400 mt-0.5">{purchases.length} transactions</p>
+              <p className="text-xs text-slate-400 mt-0.5">{purchases.length} total transactions</p>
             </div>
             {purchases.length > 0 && (
-              <button className="text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors border border-slate-200 rounded-lg px-3 py-1.5 bg-white">
-                Export CSV
+              <button className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors border border-slate-200 rounded-lg px-3 py-1.5 bg-white">
+                <i className="fa-solid fa-download text-xs" />Export CSV
               </button>
             )}
           </div>
 
           {purchases.length === 0 ? (
             <div className="bg-white rounded-3xl border border-slate-200 p-16 text-center">
+              <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 mb-4">
+                <i className="fa-solid fa-clock-rotate-left text-slate-400 text-xl" />
+              </div>
               <p className="text-slate-400 text-sm">No transactions yet</p>
             </div>
           ) : (
             <div className="space-y-6">
               {Object.entries(grouped).map(([month, items]) => (
                 <div key={month}>
-                  {/* Month separator */}
                   <div className="flex items-center gap-3 mb-3">
                     <span className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">{month}</span>
                     <div className="flex-1 h-px bg-slate-200" />
-                    <span className="text-[11px] text-slate-400 mono font-medium">
+                    <span className="text-[11px] text-slate-400 mono font-semibold">
                       {fmt(items.reduce((s, p) => s + (p.price_cents || 0), 0))}
                     </span>
                   </div>
@@ -190,7 +188,7 @@ export default async function BillingHistoryPage() {
                       <span className="col-span-1 text-right">Amount</span>
                     </div>
                     {items.map((p, i) => {
-                      const catKey = (p.category || "").toLowerCase();
+                      const catKey  = (p.category || "").toLowerCase();
                       const badgeCls = CAT_BADGE[catKey] || "bg-slate-100 text-slate-500 border-slate-200";
                       return (
                         <div

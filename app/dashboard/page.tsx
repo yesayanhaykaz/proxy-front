@@ -73,65 +73,58 @@ async function getSubscriptions(userId: string): Promise<Sub[]> {
 
 const TYPE_CONFIG = {
   Residential: {
-    border: "border-violet-200", bg: "bg-violet-50/40",
+    border: "border-violet-200", bg: "bg-violet-50/50",
     badge: "bg-violet-100 text-violet-700 border-violet-200",
-    dot: "bg-violet-500", bar: "bg-violet-500", icon: "🏠",
+    dot: "bg-violet-500", bar: "bg-violet-500",
+    faIcon: "fa-house",
+    iconColor: "text-violet-500",
   },
   Mobile: {
-    border: "border-emerald-200", bg: "bg-emerald-50/40",
+    border: "border-emerald-200", bg: "bg-emerald-50/50",
     badge: "bg-emerald-100 text-emerald-700 border-emerald-200",
-    dot: "bg-emerald-500", bar: "bg-emerald-500", icon: "📱",
+    dot: "bg-emerald-500", bar: "bg-emerald-500",
+    faIcon: "fa-mobile-screen",
+    iconColor: "text-emerald-500",
   },
   Datacenter: {
-    border: "border-sky-200", bg: "bg-sky-50/40",
+    border: "border-sky-200", bg: "bg-sky-50/50",
     badge: "bg-sky-100 text-sky-700 border-sky-200",
-    dot: "bg-sky-500", bar: "bg-sky-500", icon: "🖥️",
+    dot: "bg-sky-500", bar: "bg-sky-500",
+    faIcon: "fa-server",
+    iconColor: "text-sky-500",
   },
   Fast: {
-    border: "border-amber-200", bg: "bg-amber-50/40",
+    border: "border-amber-200", bg: "bg-amber-50/50",
     badge: "bg-amber-100 text-amber-700 border-amber-200",
-    dot: "bg-amber-500", bar: "bg-amber-500", icon: "⚡",
+    dot: "bg-amber-500", bar: "bg-amber-500",
+    faIcon: "fa-bolt",
+    iconColor: "text-amber-500",
   },
 };
 
 export default async function DashboardPage() {
   const cookieStore = cookies();
-  const email   = decodeURIComponent(cookieStore.get("ps_email")?.value || "user");
-  const userId  = cookieStore.get("ps_uid")?.value || "";
-  const subs    = await getSubscriptions(userId);
-  const active  = subs.filter((s) => s.status === "Active");
+  const email  = decodeURIComponent(cookieStore.get("ps_email")?.value || "user");
+  const userId = cookieStore.get("ps_uid")?.value || "";
+  const subs   = await getSubscriptions(userId);
+  const active = subs.filter((s) => s.status === "Active");
 
   return (
     <div className="min-h-screen bg-slate-50 font-['Sora',sans-serif] text-slate-900">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
         .mono { font-family: 'JetBrains Mono', monospace; }
         @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
         .fu  { animation: fadeUp .4s ease both; }
         .fu1 { animation-delay:.06s; }
         .fu2 { animation-delay:.12s; }
         .card { transition: box-shadow .2s, transform .2s; }
-        .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.08); transform: translateY(-1px); }
+        .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.07); transform: translateY(-1px); }
       `}</style>
 
-      {/* Navbar */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div className="mx-auto max-w-6xl px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-xs font-black">P</div>
-            <span className="font-bold text-slate-800 text-sm tracking-tight">ProxiesSeller</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-1">
-            {[["Dashboard","/dashboard",true],["Billing","/dashboard/billing",false],["History","/dashboard/history",false],["Profile","/dashboard/profile",false],["Settings","/dashboard/settings",false]].map(([l,h,a]) => (
-              <Link key={String(h)} href={String(h)} className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${a ? "bg-slate-900 text-white" : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"}`}>{String(l)}</Link>
-            ))}
-          </nav>
-          <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold">{email[0]?.toUpperCase()}</div>
-            <span className="hidden md:block text-sm text-slate-500 font-medium max-w-[150px] truncate">{email}</span>
-          </div>
-        </div>
-      </header>
+      {/* Font Awesome CDN */}
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
       <main className="mx-auto max-w-6xl px-4 py-10">
 
@@ -141,19 +134,23 @@ export default async function DashboardPage() {
           <h1 className="text-4xl font-extrabold tracking-tight">
             Welcome back, <span className="text-violet-600">{email.split("@")[0]}</span>
           </h1>
-          <p className="mt-2 text-sm text-slate-500">{active.length} active {active.length === 1 ? "proxy" : "proxies"} running</p>
+          <p className="mt-2 text-sm text-slate-500">
+            {active.length} active {active.length === 1 ? "proxy" : "proxies"} running
+          </p>
         </div>
 
-        {/* Stats */}
+        {/* Stat cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 fu fu1">
           {[
-            { label: "Active Proxies", value: active.length,   icon: "✦", accent: "text-violet-600" },
-            { label: "Total Plans",    value: subs.length,     icon: "◈", accent: "text-slate-700"  },
-            { label: "Bandwidth",      value: "∞",             icon: "⟳", accent: "text-slate-700"  },
-            { label: "Uptime",         value: "99.9%",         icon: "◎", accent: "text-emerald-600"},
+            { label: "Active Proxies", value: active.length, icon: "fa-circle-check", accent: "text-violet-600",  bg: "bg-violet-50",  border: "border-violet-100" },
+            { label: "Total Plans",    value: subs.length,   icon: "fa-layer-group",  accent: "text-slate-600",   bg: "bg-slate-100",  border: "border-slate-200"  },
+            { label: "Bandwidth",      value: "∞",           icon: "fa-infinity",     accent: "text-slate-600",   bg: "bg-slate-100",  border: "border-slate-200"  },
+            { label: "Uptime",         value: "99.9%",       icon: "fa-signal",       accent: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100"},
           ].map((s) => (
             <div key={s.label} className="bg-white rounded-2xl border border-slate-200 p-5 card">
-              <div className={`text-lg mb-3 ${s.accent}`}>{s.icon}</div>
+              <div className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${s.bg} border ${s.border} mb-3`}>
+                <i className={`fa-solid ${s.icon} ${s.accent} text-sm`} />
+              </div>
               <div className={`text-2xl font-extrabold ${s.accent}`}>{s.value}</div>
               <div className="text-xs text-slate-400 mt-1 font-medium">{s.label}</div>
             </div>
@@ -164,13 +161,20 @@ export default async function DashboardPage() {
         <div className="fu fu2">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-extrabold">My Subscriptions</h2>
-            <Link href="/pricing" className="text-sm font-semibold text-violet-600 hover:text-violet-700 transition-colors">Add proxy →</Link>
+            <Link href="/pricing" className="inline-flex items-center gap-2 text-sm font-semibold text-violet-600 hover:text-violet-700 transition-colors">
+              <i className="fa-solid fa-plus text-xs" /> Add proxy
+            </Link>
           </div>
 
           {subs.length === 0 ? (
             <div className="bg-white rounded-3xl border border-slate-200 p-16 text-center">
+              <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 mb-4">
+                <i className="fa-solid fa-network-wired text-slate-400 text-xl" />
+              </div>
               <p className="text-slate-400 text-sm mb-5">No active proxies yet</p>
-              <Link href="/pricing" className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-colors">Browse plans →</Link>
+              <Link href="/pricing" className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-colors">
+                Browse plans <i className="fa-solid fa-arrow-right text-xs" />
+              </Link>
             </div>
           ) : (
             <div className="grid gap-4">
@@ -188,7 +192,7 @@ export default async function DashboardPage() {
 
                           {/* Header row */}
                           <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <span className="text-lg leading-none">{c.icon}</span>
+                            <i className={`fa-solid ${c.faIcon} ${c.iconColor} text-sm w-4 text-center`} />
                             <span className="font-extrabold text-base text-slate-900">{s.planName}</span>
                             <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold ${c.badge}`}>
                               <span className={`h-1.5 w-1.5 rounded-full ${c.dot}`} />{s.type}
@@ -202,33 +206,48 @@ export default async function DashboardPage() {
                             )}
                           </div>
 
-                          <p className="text-xs text-slate-400 font-medium mb-4">Activated {s.renewsOn}</p>
+                          <p className="text-xs text-slate-400 font-medium mb-4">
+                            <i className="fa-regular fa-calendar mr-1.5" />Activated {s.renewsOn}
+                          </p>
 
                           {/* Credentials */}
                           {s.host && (
                             <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm mb-4">
-                              <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-3">Proxy Credentials</p>
-                              <div className="grid grid-cols-2 gap-x-8 gap-y-2 mb-3">
-                                {[["Host", s.host], ["Port", String(s.port)], ["Username", s.proxy_username], ["Protocol", s.protocol], ["Password", "••••••••"]].map(([k, v]) => (
-                                  <div key={k} className="flex items-baseline gap-2">
-                                    <span className="text-[11px] text-slate-400 w-16 shrink-0 font-medium">{k}</span>
+                              <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-1.5">
+                                <i className="fa-solid fa-key text-slate-300" />Proxy Credentials
+                              </p>
+                              <div className="grid grid-cols-2 gap-x-8 gap-y-2.5 mb-3">
+                                {[
+                                  { k: "Host",     v: s.host,             icon: "fa-globe" },
+                                  { k: "Port",     v: String(s.port),     icon: "fa-plug" },
+                                  { k: "Username", v: s.proxy_username,   icon: "fa-user" },
+                                  { k: "Protocol", v: s.protocol,         icon: "fa-shield" },
+                                  { k: "Password", v: "••••••••",         icon: "fa-lock" },
+                                ].map(({ k, v, icon }) => (
+                                  <div key={k} className="flex items-center gap-2">
+                                    <i className={`fa-solid ${icon} text-slate-300 text-[10px] w-3 text-center`} />
+                                    <span className="text-[11px] text-slate-400 w-14 shrink-0 font-medium">{k}</span>
                                     <span className="text-[11px] mono font-semibold text-slate-700 truncate">{v}</span>
                                   </div>
                                 ))}
                               </div>
                               {proxyStr && (
                                 <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
-                                  <code className="flex-1 min-w-0 truncate bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] mono text-slate-600">{proxyStr}</code>
-                                  <button className="shrink-0 bg-slate-900 hover:bg-slate-700 text-white rounded-lg px-3 py-2 text-[11px] font-bold transition-colors">Copy</button>
+                                  <code className="flex-1 min-w-0 truncate bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[11px] mono text-slate-600">
+                                    {proxyStr}
+                                  </code>
+                                  <button className="shrink-0 flex items-center gap-1.5 bg-slate-900 hover:bg-slate-700 text-white rounded-lg px-3 py-2 text-[11px] font-bold transition-colors">
+                                    <i className="fa-regular fa-copy text-[10px]" />Copy
+                                  </button>
                                 </div>
                               )}
                             </div>
                           )}
 
-                          {/* Usage */}
+                          {/* Usage bar */}
                           <div>
                             <div className="flex justify-between text-[11px] text-slate-400 font-medium mb-1.5">
-                              <span>Bandwidth usage</span>
+                              <span className="flex items-center gap-1"><i className="fa-solid fa-chart-bar text-[9px]" />Bandwidth usage</span>
                               <span>{s.usage.used} / {s.usage.total} {s.usage.unit}</span>
                             </div>
                             <div className="h-1.5 rounded-full bg-slate-200 overflow-hidden">
@@ -237,8 +256,11 @@ export default async function DashboardPage() {
                           </div>
                         </div>
 
-                        <Link href={`/dashboard/subscription?id=${encodeURIComponent(s.id)}`} className="shrink-0 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 text-xs font-bold transition-colors shadow-sm">
-                          Details →
+                        <Link
+                          href={`/dashboard/subscription?id=${encodeURIComponent(s.id)}`}
+                          className="shrink-0 flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 text-xs font-bold transition-colors shadow-sm"
+                        >
+                          Details <i className="fa-solid fa-arrow-right text-[10px]" />
                         </Link>
                       </div>
                     </div>
