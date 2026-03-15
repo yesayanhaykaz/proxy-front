@@ -45,31 +45,36 @@ export function Hero() {
             Residential, Mobile, Datacenter and Fast proxies built for scraping, automation, and scale.
           </p>
 
-{/* CTA */}
 <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
   <Link
     href="/pricing"
-    className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-7 py-3 text-sm font-extrabold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+    className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-7 py-3 text-sm font-extrabold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500"
   >
     Explore Plans
-    <span className="ml-2 text-white/80">→</span>
+    <span className="ml-2">→</span>
   </Link>
 
   <Link
     href="/documentation"
-    className="inline-flex items-center justify-center rounded-2xl border border-white/12 bg-white/6 px-7 py-3 text-sm font-extrabold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+    className="inline-flex items-center justify-center rounded-2xl border border-white/12 bg-white/6 px-7 py-3 text-sm font-extrabold text-white transition hover:bg-white/10"
   >
     View Docs
   </Link>
 
-<Link
-  href="/proxy-builder"
-  className="group relative inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-500 px-7 py-3 text-sm font-extrabold text-white shadow-lg shadow-indigo-500/30 transition hover:scale-[1.03] hover:from-sky-400 hover:to-indigo-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
->
-  Build Your Proxy
-  <span className="ml-2 transition-transform group-hover:translate-x-1">→</span>
-</Link>
+  <Link
+    href="/proxy-builder"
+    className="group relative inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-500 px-7 py-3 text-sm font-extrabold text-white shadow-lg shadow-indigo-500/30 transition hover:scale-[1.03] hover:from-sky-400 hover:to-indigo-400"
+  >
+    Build Your Proxy
+    <span className="ml-2 transition-transform group-hover:translate-x-1">→</span>
+  </Link>
 </div>
+
+<p className="mt-4 text-sm text-sky-300 font-semibold animate-pulse">
+  Configure location, protocol and traffic in seconds.
+</p>
+
+
 
           {/* Trust stats (more premium) */}
           <div className="mt-12 grid grid-cols-2 gap-3 text-left sm:grid-cols-4">
