@@ -60,7 +60,9 @@ export async function POST(req: Request) {
     }
 
     // Redirect to dashboard after successful order
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+const host = req.headers.get("host") || "localhost:3000";
+const proto = process.env.NODE_ENV === "production" ? "https" : "http";
+return NextResponse.redirect(`${proto}://${host}/dashboard`);
 
   } catch (err) {
     console.error("Checkout error:", err);
