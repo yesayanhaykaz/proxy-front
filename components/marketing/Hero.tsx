@@ -45,22 +45,31 @@ export function Hero() {
             Residential, Mobile, Datacenter and Fast proxies built for scraping, automation, and scale.
           </p>
 
-          {/* CTA */}
-          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/pricing"
-              className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-7 py-3 text-sm font-extrabold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-            >
-              Explore Plans
-              <span className="ml-2 text-white/80">→</span>
-            </Link>
-            <Link
-              href="/documentation"
-              className="inline-flex items-center justify-center rounded-2xl border border-white/12 bg-white/6 px-7 py-3 text-sm font-extrabold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-            >
-              View Docs
-            </Link>
-          </div>
+{/* CTA */}
+<div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+  <Link
+    href="/pricing"
+    className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-7 py-3 text-sm font-extrabold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+  >
+    Explore Plans
+    <span className="ml-2 text-white/80">→</span>
+  </Link>
+
+  <Link
+    href="/documentation"
+    className="inline-flex items-center justify-center rounded-2xl border border-white/12 bg-white/6 px-7 py-3 text-sm font-extrabold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+  >
+    View Docs
+  </Link>
+
+  <Link
+    href="/proxy-builder"
+    className="inline-flex items-center justify-center rounded-2xl bg-emerald-500 px-7 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+  >
+    Buy With 1 Click
+    <span className="ml-2 text-white/80">⚡</span>
+  </Link>
+</div>
 
           {/* Trust stats (more premium) */}
           <div className="mt-12 grid grid-cols-2 gap-3 text-left sm:grid-cols-4">
