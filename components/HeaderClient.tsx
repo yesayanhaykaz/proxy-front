@@ -16,7 +16,7 @@ const TOP_NAV = [
   { href: "/mobile-proxies", label: "Mobile" },
   { href: "/datacenter-proxies", label: "Datacenter" },
   { href: "/fast-proxies", label: "Fast" },
-  { href: "/proxy-builder", label: "Create custom package" },
+  { href: "/proxy-builder", label: "CUSTOM" },
 ];
 
 const PRICING_PROXY_TYPES: Item[] = [
