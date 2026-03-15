@@ -26,11 +26,9 @@ export async function POST(req: Request) {
     const country = String(form.get("country") || "");
     const traffic = String(form.get("traffic") || "");
 
-    let payload: any = {
-      user_id: userId
-    };
+    let payload: any;
 
-    // CUSTOM PROXY BUILDER
+    // CUSTOM BUILDER
     if (plan === "custom") {
 
       if (!network || !protocol) {
@@ -42,7 +40,7 @@ export async function POST(req: Request) {
 
       payload = {
         user_id: userId,
-        package_id: "custom", // REQUIRED by backend
+        package_id: "custom",
         network,
         session,
         protocol,
@@ -52,7 +50,6 @@ export async function POST(req: Request) {
 
     } else {
 
-      // NORMAL PACKAGE PURCHASE
       if (!plan) {
         return NextResponse.json(
           { error: "missing_plan" },
@@ -83,21 +80,13 @@ export async function POST(req: Request) {
 
     if (!r.ok) {
       return NextResponse.json(
-        {
-          error: "backend_error",
-          detail: text
-        },
+        { error: "backend_error", detail: text },
         { status: 500 }
       );
     }
 
-    const host = req.headers.get("host");
-    const proto = req.headers.get("x-forwarded-proto") || "https";
-
-    return NextResponse.redirect(
-      `${proto}://${host}/dashboard`,
-      303
-    );
+    // ✅ RELATIVE redirect (most reliable)
+    return NextResponse.redirect(new URL("/dashboard", req.url));
 
   } catch (e) {
 

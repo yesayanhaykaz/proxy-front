@@ -39,9 +39,7 @@ async function getPlan(planId: string) {
     trial: "Trial available soon",
   };
 }
-if (isCustom && (!searchParams.network || !searchParams.protocol)) {
-  redirect("/builder");
-}
+
 type CheckoutPaymentPanelProps = {
   email: string;
   planId: string;
