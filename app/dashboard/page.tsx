@@ -111,7 +111,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-['Sora',sans-serif] text-slate-900">
-      <style suppressHydrationWarning>{`
+      <style>{`
         @import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
         @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css");
         .mono { font-family: 'JetBrains Mono', monospace; }
