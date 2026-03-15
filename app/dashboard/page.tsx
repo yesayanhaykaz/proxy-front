@@ -1,15 +1,5 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import {
-  ArrowRight,
-  CreditCard,
-  Globe2,
-  ShieldCheck,
-  Zap,
-  Boxes,
-  Sparkles,
-  Server,
-} from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -49,27 +39,46 @@ function mapPurchase(p: Purchase): Sub {
     type: p.category,
     status: p.status === "active" ? "Active" : "Expired",
     renewsOn: new Date(p.created_at).toLocaleDateString(),
-    usage: { used: 0, total: 5, unit: "GB" }, // you can later load real traffic
+    usage: {
+      used: 0,
+      total: 5,
+      unit: "GB",
+    },
     location: "Global",
   };
 }
 
 async function getSubscriptions(userId: string): Promise<Sub[]> {
+  if (!userId) return [];
+
   try {
     const res = await fetch(`${process.env.API_URL}/api/purchases`, {
       headers: {
         "X-User-Id": userId,
+        "Content-Type": "application/json",
       },
       cache: "no-store",
     });
 
-    if (!res.ok) return [];
+    if (!res.ok) {
+      console.error("Dashboard API error:", res.status);
+      return [];
+    }
 
     const data = await res.json();
-    const purchases: Purchase[] = data.purchases || [];
+
+    console.log("Dashboard purchases response:", data);
+
+    // support multiple backend formats
+    let purchases: Purchase[] = [];
+
+    if (Array.isArray(data)) purchases = data;
+    else if (Array.isArray(data.purchases)) purchases = data.purchases;
+    else if (Array.isArray(data.data)) purchases = data.data;
 
     return purchases.map(mapPurchase);
-  } catch {
+  } catch (e) {
+    console.error("Dashboard fetch error:", e);
     return [];
   }
 }
@@ -85,7 +94,7 @@ function badgeType(type: Sub["type"]) {
       : "bg-amber-50 text-amber-800 border-amber-200";
 
   return (
-    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-extrabold ${cls}`}>
+    <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-extrabold ${cls}`}>
       {type}
     </span>
   );
@@ -93,19 +102,24 @@ function badgeType(type: Sub["type"]) {
 
 function statusPill(status: Sub["status"]) {
   return status === "Active" ? (
-    <span className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-extrabold text-emerald-800">
+    <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-extrabold text-emerald-800">
       Active
     </span>
   ) : (
-    <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-extrabold text-slate-700">
+    <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-extrabold text-slate-700">
       Expired
     </span>
   );
 }
 
 export default async function DashboardPage() {
-  const email = decodeURIComponent(cookies().get("ps_email")?.value || "user");
-  const userId = cookies().get("ps_uid")?.value || "";
+  const cookieStore = cookies();
+
+  const email = decodeURIComponent(
+    cookieStore.get("ps_email")?.value || "user"
+  );
+
+  const userId = cookieStore.get("ps_uid")?.value || "";
 
   const subs = await getSubscriptions(userId);
 
@@ -113,13 +127,12 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-slate-50">
       <main className="mx-auto max-w-6xl px-4 py-10">
 
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">
-            Welcome back, <span className="text-indigo-700">{email}</span>
-          </h1>
-        </div>
+        <h1 className="text-2xl font-extrabold text-slate-900">
+          Welcome back, <span className="text-indigo-700">{email}</span>
+        </h1>
 
         <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+
           <h2 className="text-xl font-extrabold text-slate-900">
             My subscriptions
           </h2>
@@ -127,6 +140,7 @@ export default async function DashboardPage() {
           {subs.length === 0 && (
             <div className="py-10 text-center text-slate-500">
               No active proxies yet.
+
               <div className="mt-4">
                 <Link
                   href="/pricing"
@@ -147,13 +161,20 @@ export default async function DashboardPage() {
                   key={s.id}
                   className="rounded-3xl border border-slate-200 bg-white p-5"
                 >
+
                   <div className="flex justify-between">
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <div className="font-extrabold">{s.planName}</div>
+
+                        <div className="font-extrabold">
+                          {s.planName}
+                        </div>
+
                         {badgeType(s.type)}
+
                         {statusPill(s.status)}
+
                       </div>
 
                       <div className="text-sm text-slate-600 mt-2">
@@ -161,31 +182,31 @@ export default async function DashboardPage() {
                       </div>
 
                       <div className="mt-3 h-2 bg-slate-100 rounded-full">
+
                         <div
                           className="h-full bg-indigo-600 rounded-full"
                           style={{ width: `${progress}%` }}
                         />
+
                       </div>
                     </div>
 
-                    <div>
-                      <Link
-                        href={`/dashboard/subscription?id=${encodeURIComponent(
-                          s.id
-                        )}`}
-                        className="rounded-xl border px-4 py-2 text-sm"
-                      >
-                        Details
-                      </Link>
-                    </div>
+                    <Link
+                      href={`/dashboard/subscription?id=${encodeURIComponent(
+                        s.id
+                      )}`}
+                      className="rounded-xl border px-4 py-2 text-sm"
+                    >
+                      Details
+                    </Link>
 
                   </div>
                 </div>
               );
             })}
           </div>
-        </div>
 
+        </div>
       </main>
     </div>
   );
