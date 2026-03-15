@@ -1,69 +1,57 @@
 import { NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
 import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
-  const form = await req.formData();
 
-  const plan = String(form.get("plan") || "");
-  const network = String(form.get("network") || "");
-  const session = String(form.get("session") || "");
-  const protocol = String(form.get("protocol") || "");
-  const country = String(form.get("country") || "");
-  const traffic = String(form.get("traffic") || "");
-
-  const jar = cookies();
-  const userId = jar.get("ps_uid")?.value || "";
+  // use the same auth check used by dashboard
+  const session = await getSession();
+console.log("ALL COOKIES:", cookies().getAll());
+  const userId =
+    (session as any)?.id ||
+    (session as any)?.user?.id ||
+    (session as any)?.user_id;
 
   if (!userId) {
-    return NextResponse.json(
-      { error: "not_logged_in" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "not_logged_in" }, { status: 401 });
   }
 
-  try {
+  const form = await req.formData();
 
-    // 🔹 call your PHP backend
-    const res = await fetch(`${process.env.API_BASE}/order`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_id: userId,
-        package_id: plan,
-        network,
-        session,
-        protocol,
-        country,
-        traffic
-      }),
-    });
+  const plan = form.get("plan");
+  const network = form.get("network");
+  const sessionType = form.get("session");
+  const protocol = form.get("protocol");
+  const country = form.get("country");
+  const traffic = form.get("traffic");
 
-    if (!res.ok) {
-      const txt = await res.text();
-      console.error("Order failed:", txt);
+  console.log("Checkout request:", {
+    userId,
+    plan,
+    network,
+    sessionType,
+    protocol,
+    country,
+    traffic
+  });
 
-      return NextResponse.json(
-        { error: "order_failed" },
-        { status: 500 }
-      );
-    }
+  // call your PHP backend
+  await fetch(`${process.env.API_BASE}/order`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      package_id: plan,
+      network,
+      session: sessionType,
+      protocol,
+      country,
+      traffic
+    })
+  });
 
-    const data = await res.json();
-
-    console.log("Purchase created:", data);
-
-  } catch (err) {
-    console.error("Checkout error:", err);
-
-    return NextResponse.json(
-      { error: "checkout_error" },
-      { status: 500 }
-    );
-  }
-
-  // 🔹 redirect to dashboard
   const host = req.headers.get("host");
   const proto = req.headers.get("x-forwarded-proto") || "https";
 
