@@ -42,6 +42,7 @@ const handleBuy = () => {
   const isLoggedIn = document.cookie.includes("ps_session=");
 
   const params = new URLSearchParams({
+    plan: "custom",
     custom: "1",
     network,
     session,
