@@ -66,27 +66,30 @@ function mapPurchase(p: Purchase): Sub {
 }
 
 async function getSubscriptions(userId: string): Promise<Sub[]> {
-  if (!userId) return [];
 
-  try {
-    const res = await fetch("https://api.proxiesseller.cc/api/purchases", {
-      headers: {
-        "X-User-Id": userId,
-      },
-      cache: "no-store",
-    });
+  console.log("Dashboard userId:", userId);
 
-    if (!res.ok) return [];
-
-    const data = await res.json();
-
-    const purchases: Purchase[] = data.purchases || [];
-
-    return purchases.map(mapPurchase);
-  } catch {
+  if (!userId) {
+    console.log("No userId cookie");
     return [];
   }
+
+  const res = await fetch("https://api.proxiesseller.cc/api/purchases", {
+    headers: {
+      "X-User-Id": userId,
+    },
+    cache: "no-store",
+  });
+
+  console.log("Dashboard API status:", res.status);
+
+  const data = await res.json();
+
+  console.log("Dashboard API data:", data);
+
+  return (data.purchases || []).map(mapPurchase);
 }
+
 
 function badgeType(type: Sub["type"]) {
   const cls =
