@@ -63,8 +63,7 @@ export default async function BillingHistoryPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-['Sora',sans-serif] text-slate-900">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+      <style dangerouslySetInnerHTML={{ __html: `
         .mono { font-family: 'JetBrains Mono', monospace; }
         @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
         .fu  { animation: fadeUp .4s ease both; }
@@ -74,9 +73,7 @@ export default async function BillingHistoryPage() {
         .card { transition: box-shadow .2s, transform .2s; }
         .card:hover { box-shadow: 0 6px 24px rgba(0,0,0,.07); transform: translateY(-1px); }
         .row:hover { background: #f8fafc; }
-      `}</style>
-
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+      ` }} />
 
       <main className="mx-auto max-w-5xl px-4 py-10 space-y-8">
 
