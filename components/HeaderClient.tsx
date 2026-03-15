@@ -16,6 +16,7 @@ const TOP_NAV = [
   { href: "/mobile-proxies", label: "Mobile" },
   { href: "/datacenter-proxies", label: "Datacenter" },
   { href: "/fast-proxies", label: "Fast" },
+  { href: "/proxy-builder", label: "Create custom package" },
 ];
 
 const PRICING_PROXY_TYPES: Item[] = [
@@ -29,6 +30,7 @@ const PRICING_PLANS: Item[] = [
   { href: "/pricing#starter", label: "Starter Plan", icon: "bi bi-rocket-takeoff" },
   { href: "/pricing#professional", label: "Professional Plan", icon: "bi bi-briefcase" },
   { href: "/pricing#enterprise", label: "Enterprise Plan", icon: "bi bi-building" },
+  { href: "/proxy-builder", label: "Your Proxy", icon: "bi bi-rocket-takeoff" },
 ];
 
 const PRICING_EXTRAS: Item[] = [
