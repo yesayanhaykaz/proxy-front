@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     const jar = cookies();
 
     // cookie format: user_id:email:hash
-    const raw = jar.get("ps_email")?.value || "";
+    const raw = jar.get("ps_session")?.value || "";
     const userId = raw.split(":")[0];
 
     if (!userId) {
