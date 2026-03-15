@@ -19,20 +19,30 @@ export async function POST(req: Request) {
 
     const form = await req.formData();
 
-    const plan = form.get("plan");
-    const network = form.get("network");
-    const session = form.get("session");
-    const protocol = form.get("protocol");
-    const country = form.get("country");
-    const traffic = form.get("traffic");
+    const plan = String(form.get("plan") || "");
+    const network = String(form.get("network") || "");
+    const session = String(form.get("session") || "");
+    const protocol = String(form.get("protocol") || "");
+    const country = String(form.get("country") || "");
+    const traffic = String(form.get("traffic") || "");
 
-    let payload: any;
+    let payload: any = {
+      user_id: userId
+    };
 
-    // if custom proxy builder
+    // CUSTOM PROXY BUILDER
     if (plan === "custom") {
+
+      if (!network || !protocol) {
+        return NextResponse.json(
+          { error: "missing_config", message: "Network or protocol missing" },
+          { status: 400 }
+        );
+      }
 
       payload = {
         user_id: userId,
+        package_id: "custom", // REQUIRED by backend
         network,
         session,
         protocol,
@@ -41,6 +51,14 @@ export async function POST(req: Request) {
       };
 
     } else {
+
+      // NORMAL PACKAGE PURCHASE
+      if (!plan) {
+        return NextResponse.json(
+          { error: "missing_plan" },
+          { status: 400 }
+        );
+      }
 
       payload = {
         user_id: userId,
@@ -59,9 +77,19 @@ export async function POST(req: Request) {
       body: JSON.stringify(payload)
     });
 
-    const data = await r.text();
+    const text = await r.text();
 
-    console.log("Backend response:", data);
+    console.log("Backend response:", text);
+
+    if (!r.ok) {
+      return NextResponse.json(
+        {
+          error: "backend_error",
+          detail: text
+        },
+        { status: 500 }
+      );
+    }
 
     const host = req.headers.get("host");
     const proto = req.headers.get("x-forwarded-proto") || "https";
