@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
-
   try {
 
     const jar = cookies();
@@ -27,30 +26,37 @@ export async function POST(req: Request) {
     const country = form.get("country");
     const traffic = form.get("traffic");
 
-    console.log("Creating order:", {
-      user_id: userId,
-      plan,
-      network,
-      session,
-      protocol,
-      country,
-      traffic
-    });
+    let payload: any;
+
+    // if custom proxy builder
+    if (plan === "custom") {
+
+      payload = {
+        user_id: userId,
+        network,
+        session,
+        protocol,
+        country,
+        traffic
+      };
+
+    } else {
+
+      payload = {
+        user_id: userId,
+        package_id: plan
+      };
+
+    }
+
+    console.log("Creating order payload:", payload);
 
     const r = await fetch(`${process.env.API_BASE}/order`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        user_id: userId,
-        package_id: plan,
-        network,
-        session,
-        protocol,
-        country,
-        traffic
-      })
+      body: JSON.stringify(payload)
     });
 
     const data = await r.text();
@@ -78,5 +84,4 @@ export async function POST(req: Request) {
     );
 
   }
-
 }
