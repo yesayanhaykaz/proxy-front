@@ -154,7 +154,7 @@ export default async function CheckoutPage({
 }
 }) {
   const planId = searchParams.plan ? String(searchParams.plan) : "";
-  const isCustom = searchParams.custom === "1";
+  const isCustom = searchParams.plan === "custom";
 
   const mode = searchParams.mode === "login" ? "login" : "register";
 
