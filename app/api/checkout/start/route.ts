@@ -1,50 +1,69 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
 
   try {
 
-    console.log("checkout start");
+    const jar = cookies();
+    const email = jar.get("ps_session")?.value || "";
 
-    const session = await getSession();
-    console.log("session:", session);
-
-    const userId =
-      (session as any)?.id ||
-      (session as any)?.user?.id ||
-      (session as any)?.user_id;
-
-    console.log("userId:", userId);
+    if (!email) {
+      return NextResponse.json({ error: "not_logged_in" }, { status: 401 });
+    }
 
     const form = await req.formData();
 
     const plan = form.get("plan");
+    const network = form.get("network");
+    const session = form.get("session");
+    const protocol = form.get("protocol");
+    const country = form.get("country");
+    const traffic = form.get("traffic");
 
-    console.log("plan:", plan);
+    const backendUrl = `${process.env.API_BASE}/order`;
 
-    const response = await fetch(`${process.env.API_BASE}/order`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ user_id: userId, package_id: plan }),
+    console.log("Creating order:", {
+      email,
+      plan,
+      network,
+      session,
+      protocol,
+      country,
+      traffic
     });
 
-    console.log("backend status:", response.status);
+    const r = await fetch(backendUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        package_id: plan,
+        network,
+        session,
+        protocol,
+        country,
+        traffic
+      })
+    });
+
+    const data = await r.text();
+    console.log("Backend response:", data);
 
     const host = req.headers.get("host");
     const proto = req.headers.get("x-forwarded-proto") || "https";
 
     return NextResponse.redirect(`${proto}://${host}/dashboard`, 303);
 
-  } catch (err) {
+  } catch (e) {
 
-    console.error("CHECKOUT ERROR:", err);
+    return NextResponse.json({
+      error: "checkout_failed",
+      detail: String(e)
+    }, { status: 500 });
 
-    return NextResponse.json(
-      { error: "checkout_failed", detail: String(err) },
-      { status: 500 }
-    );
   }
+
 }

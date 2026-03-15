@@ -10,7 +10,6 @@ function errRedirect(req: Request, next: string, code: string) {
     const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
     const u = new URL("/auth/login", origin);
 
-    // лучше без "/" в названии параметра, иначе неудобно читать/парсить
     u.searchParams.set("error", code);
     u.searchParams.set("next", next);
 
@@ -60,6 +59,5 @@ export async function POST(req: Request) {
 
     setSession({ id: userId, email });
 
-    // успешный редирект тоже лучше делать через origin из заголовков
     return NextResponse.redirect(new URL(next, orig), 303);
 }
