@@ -20,5 +20,10 @@ export async function POST(req: Request) {
     traffic
   });
 
-  return NextResponse.redirect("/dashboard", 303);
+  const host = req.headers.get("host");
+  const protocolHeader = req.headers.get("x-forwarded-proto") || "https";
+
+  const url = `${protocolHeader}://${host}/dashboard`;
+
+  return NextResponse.redirect(url, 303);
 }
