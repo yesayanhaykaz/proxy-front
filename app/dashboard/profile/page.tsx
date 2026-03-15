@@ -2,330 +2,246 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
 
-const cookieStore = cookies();
-
-const user = {
-  name: "User",
-  email: decodeURIComponent(cookieStore.get("ps_email")?.value || ""),
-  company: "",
-  country: "",
-  city: "",
-  timezone: "UTC",
-};
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Profile | Proxiesseller Dashboard",
+  title: "Profile | ProxiesSeller",
   description: "Manage your account profile, password, and security settings.",
   robots: { index: false, follow: false },
 };
 
-function Card({
-  title,
-  desc,
-  children,
-  action,
-}: {
-  title: string;
-  desc?: string;
-  children: React.ReactNode;
-  action?: React.ReactNode;
-}) {
-  return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
-        <div>
-          <h2 className="text-base font-black text-slate-900">{title}</h2>
-          {desc ? <p className="mt-1 text-sm text-slate-600">{desc}</p> : null}
-        </div>
-        {action ? <div className="shrink-0">{action}</div> : null}
-      </div>
-      <div className="px-6 py-6">{children}</div>
-    </section>
-  );
-}
-
-function Field({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <div className="flex items-end justify-between gap-3">
-        <label className="text-sm font-black text-slate-900">{label}</label>
-        {hint ? <span className="text-xs font-semibold text-slate-500">{hint}</span> : null}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      {...props}
-      className={[
-        "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900",
-        "placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20",
-        props.className ?? "",
-      ].join(" ")}
-    />
-  );
-}
-
-function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <select
-      {...props}
-      className={[
-        "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900",
-        "focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20",
-        props.className ?? "",
-      ].join(" ")}
-    />
-  );
-}
-
-function Divider() {
-  return <div className="h-px w-full bg-slate-200" />;
-}
-
 export default function ProfilePage() {
-  // TODO: Replace with real data from your auth/session
+  const cookieStore = cookies();
+  const email = decodeURIComponent(cookieStore.get("ps_email")?.value || "");
+  const displayName = email.split("@")[0] || "User";
+  const initials = displayName.slice(0, 2).toUpperCase();
 
-const cookieStore = cookies();
-
-const user = {
-  name: "User",
-  email: decodeURIComponent(cookieStore.get("ps_email")?.value || ""),
-  company: "",
-  country: "",
-  city: "",
-  timezone: "UTC",
-};
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#0a0b0f] text-white font-['Sora',sans-serif]">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); }
+        .input-field {
+          width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 12px; padding: 12px 16px; font-size: 14px; color: white;
+          font-family: 'Sora', sans-serif; font-weight: 500; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-field::placeholder { color: rgba(255,255,255,0.2); }
+        .input-field:focus { border-color: rgba(139,92,246,0.5); box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+        .input-field:disabled { opacity: 0.4; cursor: not-allowed; }
+        .select-field {
+          width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 12px; padding: 12px 16px; font-size: 14px; color: white;
+          font-family: 'Sora', sans-serif; font-weight: 500; outline: none; transition: border-color 0.2s;
+          appearance: none; cursor: pointer;
+        }
+        .select-field:focus { border-color: rgba(139,92,246,0.5); }
+        .select-field option { background: #1a1b23; }
+        .btn-primary {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: linear-gradient(135deg, #7c3aed, #4f46e5);
+          border: none; border-radius: 12px; padding: 12px 24px; font-size: 14px;
+          font-weight: 700; color: white; cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+          font-family: 'Sora', sans-serif;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 12px; padding: 12px 24px; font-size: 14px;
+          font-weight: 600; color: white; cursor: pointer; transition: background 0.2s;
+          font-family: 'Sora', sans-serif;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+        .btn-danger {
+          background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3);
+          border-radius: 12px; padding: 12px 24px; font-size: 14px; font-weight: 700;
+          color: #fca5a5; cursor: pointer; transition: background 0.2s;
+          font-family: 'Sora', sans-serif;
+        }
+        .btn-danger:hover { background: rgba(239,68,68,0.25); }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.35s ease both; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.25); margin-bottom: 20px; }
+      `}</style>
+
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2 text-sm font-bold text-slate-500">
-            <Link href="/dashboard" className="hover:text-slate-900">
-              Dashboard
-            </Link>
-            <span className="text-slate-300">/</span>
-            <span className="text-slate-900">Profile</span>
+      <header className="border-b border-white/5 px-6 py-4">
+        <div className="mx-auto max-w-5xl flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm">
+            <Link href="/dashboard" className="text-white/40 hover:text-white transition-colors font-medium">Dashboard</Link>
+            <span className="text-white/20">/</span>
+            <span className="text-white/80 font-semibold">Profile</span>
           </div>
-
-          <h1 className="mt-2 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
-            Profile
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-slate-600">
-            Update your account details, security settings, and API access.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-900 shadow-sm hover:bg-slate-50"
-          >
-            Back to dashboard
+          <Link href="/dashboard" className="btn-secondary text-sm py-2 px-4">
+            ← Back
           </Link>
         </div>
-      </div>
+      </header>
 
-      <div className="mt-8 space-y-6">
-        {/* Account details */}
-        <Card
-          title="Account details"
-          desc="Used for invoices, account recovery, and support."
-          action={
-            <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">
-              Active
+      <main className="mx-auto max-w-5xl px-4 py-10 space-y-6">
+
+        {/* Page heading */}
+        <div className="fade-up">
+          <h1 className="text-3xl font-extrabold tracking-tight">Profile Settings</h1>
+          <p className="mt-1 text-sm text-white/40">Manage your account, security, and preferences</p>
+        </div>
+
+        {/* Avatar + quick info */}
+        <div className="glass rounded-3xl p-6 fade-up flex items-center gap-5">
+          <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-2xl font-extrabold shrink-0">
+            {initials}
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-lg">{displayName}</div>
+            <div className="text-sm text-white/40 mono truncate">{email}</div>
+          </div>
+          <div className="ml-auto shrink-0">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1.5 text-xs font-bold text-emerald-300">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Active account
             </span>
-          }
-        >
+          </div>
+        </div>
+
+        {/* Account details */}
+        <div className="glass rounded-3xl p-6 fade-up">
+          <p className="section-label">Account Details</p>
           <form className="grid gap-5 sm:grid-cols-2">
-            <Field label="Full name">
-              <Input defaultValue={user.name} placeholder="John Doe" />
-            </Field>
-
-            <Field label="Email" hint="Login & receipts">
-              <Input
-                defaultValue={user.email}
-                type="email"
-                disabled
-                className="bg-slate-50 text-slate-700"
-              />
-            </Field>
-
-            <Field label="Company (optional)">
-              <Input defaultValue={user.company} placeholder="Company name" />
-            </Field>
-
-            <Field label="Country">
-              <Select defaultValue={user.country}>
-                <option>United States</option>
-                <option>Canada</option>
-                <option>United Kingdom</option>
-                <option>Germany</option>
-                <option>France</option>
-              </Select>
-            </Field>
-
-            <Field label="City">
-              <Input defaultValue={user.city} placeholder="New York" />
-            </Field>
-
-            <Field label="Timezone">
-              <Select defaultValue={user.timezone}>
-                <option value="America/New_York">America/New_York</option>
-                <option value="America/Chicago">America/Chicago</option>
-                <option value="America/Denver">America/Denver</option>
-                <option value="America/Los_Angeles">America/Los_Angeles</option>
-                <option value="UTC">UTC</option>
-              </Select>
-            </Field>
-
-            <div className="sm:col-span-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs text-slate-500">
-                Changing country/company affects future invoices.
-              </p>
-
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-black text-white shadow-lg shadow-indigo-600/20 hover:bg-indigo-500"
-              >
-                Save changes <span aria-hidden="true">→</span>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-white/60">Full name</label>
+              <input className="input-field" defaultValue={displayName} placeholder="John Doe" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-white/60">Email <span className="text-white/20 text-xs">(login & receipts)</span></label>
+              <input className="input-field" defaultValue={email} type="email" disabled />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-white/60">Company <span className="text-white/20 text-xs">(optional)</span></label>
+              <input className="input-field" placeholder="Your company" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-white/60">Country</label>
+              <div className="relative">
+                <select className="select-field">
+                  <option>United States</option>
+                  <option>Canada</option>
+                  <option>United Kingdom</option>
+                  <option>Germany</option>
+                  <option>France</option>
+                </select>
+                <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/30 text-xs">▾</div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-white/60">City</label>
+              <input className="input-field" placeholder="New York" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-white/60">Timezone</label>
+              <div className="relative">
+                <select className="select-field">
+                  <option value="America/New_York">America / New York</option>
+                  <option value="America/Chicago">America / Chicago</option>
+                  <option value="America/Los_Angeles">America / Los Angeles</option>
+                  <option value="UTC">UTC</option>
+                </select>
+                <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/30 text-xs">▾</div>
+              </div>
+            </div>
+            <div className="sm:col-span-2 flex items-center justify-between pt-2 border-t border-white/5">
+              <p className="text-xs text-white/25">Country changes affect future invoices</p>
+              <button type="submit" className="btn-primary">
+                Save changes →
               </button>
             </div>
           </form>
-        </Card>
+        </div>
 
-        {/* Security + API */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Card title="Password" desc="Use a unique password to protect your account.">
+        {/* Security + API side by side */}
+        <div className="grid gap-6 lg:grid-cols-2 fade-up">
+
+          {/* Password */}
+          <div className="glass rounded-3xl p-6">
+            <p className="section-label">Password</p>
             <form className="space-y-4">
-              <Field label="Current password">
-                <Input type="password" placeholder="••••••••" />
-              </Field>
-              <Field label="New password" hint="Min 10+ chars recommended">
-                <Input type="password" placeholder="••••••••••" />
-              </Field>
-              <Field label="Confirm new password">
-                <Input type="password" placeholder="••••••••••" />
-              </Field>
-
-              <button
-                type="submit"
-                className="mt-2 inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-black text-white hover:bg-black"
-              >
+              {[
+                { label: "Current password", ph: "••••••••" },
+                { label: "New password", ph: "Min 10+ chars", hint: "recommended" },
+                { label: "Confirm new password", ph: "••••••••••" },
+              ].map(({ label, ph }) => (
+                <div key={label} className="space-y-2">
+                  <label className="text-sm font-semibold text-white/60">{label}</label>
+                  <input className="input-field" type="password" placeholder={ph} />
+                </div>
+              ))}
+              <button type="submit" className="btn-secondary w-full justify-center mt-2">
                 Update password
               </button>
-
-              <p className="text-xs text-slate-500">
-                Tip: Use a password manager and avoid reusing passwords.
-              </p>
+              <p className="text-xs text-white/20 text-center">Use a password manager. Never reuse passwords.</p>
             </form>
-          </Card>
+          </div>
 
-          <Card title="Security & API access" desc="Manage API key and extra security options.">
-            <div className="space-y-5">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="text-sm font-black text-slate-900">Two-factor authentication (2FA)</div>
-                    <p className="mt-1 text-sm text-slate-600">
-                      Add an extra layer of protection to your dashboard login.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-900 hover:bg-slate-50"
-                  >
-                    Enable
-                  </button>
-                </div>
+          {/* API & Security */}
+          <div className="glass rounded-3xl p-6 space-y-5">
+            <p className="section-label">Security & API</p>
+
+            {/* 2FA */}
+            <div className="rounded-2xl bg-white/3 border border-white/6 p-4 flex items-start justify-between gap-4">
+              <div>
+                <div className="font-semibold text-sm">Two-factor authentication</div>
+                <p className="text-xs text-white/40 mt-1">Add an extra layer to your login</p>
               </div>
-
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <div className="text-sm font-black text-slate-900">API Key</div>
-                <p className="mt-1 text-sm text-slate-600">
-                  Use your API key for automation, usage stats, and integration workflows.
-                </p>
-
-                <div className="mt-3 flex items-center gap-3">
-                  <code className="flex-1 truncate rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs font-black text-slate-900">
-                    pk_live_••••••••••••••••••••••••••
-                  </code>
-                  <button
-                    type="button"
-                    className="rounded-xl bg-indigo-600 px-4 py-3 text-xs font-black text-white hover:bg-indigo-500"
-                  >
-                    Regenerate
-                  </button>
-                </div>
-
-                <p className="mt-2 text-xs text-slate-500">
-                  Regenerating will invalidate the old key immediately.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/documentation"
-                  className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-900 hover:bg-slate-50"
-                >
-                  Documentation
-                </Link>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-900 hover:bg-slate-50"
-                >
-                  Support
-                </Link>
-              </div>
+              <button type="button" className="btn-secondary py-2 px-3 text-xs shrink-0">
+                Enable
+              </button>
             </div>
-          </Card>
+
+            {/* API Key */}
+            <div className="rounded-2xl bg-white/3 border border-white/6 p-4">
+              <div className="font-semibold text-sm">API Key</div>
+              <p className="text-xs text-white/40 mt-1 mb-3">For automation and integrations</p>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 min-w-0 truncate rounded-xl bg-black/30 border border-white/10 px-3 py-2.5 text-xs mono text-white/50">
+                  pk_live_••••••••••••••••••••••••••
+                </code>
+                <button type="button" className="btn-secondary py-2.5 px-3 text-xs shrink-0">
+                  Regenerate
+                </button>
+              </div>
+              <p className="mt-2 text-[11px] text-white/20">Regenerating invalidates the old key immediately</p>
+            </div>
+
+            <div className="flex gap-3 pt-1">
+              <Link href="/documentation" className="btn-secondary py-2 px-4 text-xs flex-1 justify-center">
+                Docs
+              </Link>
+              <Link href="/contact" className="btn-secondary py-2 px-4 text-xs flex-1 justify-center">
+                Support
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Danger zone */}
-        <Card
-          title="Danger zone"
-          desc="Deleting your account permanently removes all plans and data."
-          action={
-            <span className="inline-flex items-center rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-black text-rose-700">
-              Careful
-            </span>
-          }
-        >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="rounded-3xl border border-red-500/20 bg-red-500/5 p-6 fade-up">
+          <div className="flex items-center justify-between gap-4">
             <div>
-              <div className="text-sm font-black text-slate-900">Delete account</div>
-              <p className="mt-1 text-sm text-slate-600">
-                This action is irreversible. Contact support if you need help before deleting.
-              </p>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-red-400 font-bold text-sm">Danger zone</span>
+                <span className="inline-flex rounded-full bg-red-500/15 border border-red-500/30 px-2.5 py-0.5 text-[11px] font-bold text-red-400">Irreversible</span>
+              </div>
+              <p className="text-xs text-white/30">Deleting your account permanently removes all plans and data. Contact support first if you need help.</p>
             </div>
-
-            <button
-              type="button"
-              className="rounded-xl bg-rose-600 px-5 py-3 text-sm font-black text-white hover:bg-rose-500"
-            >
+            <button type="button" className="btn-danger shrink-0">
               Delete account
             </button>
           </div>
+        </div>
 
-          <Divider />
-
-          <p className="mt-4 text-xs text-slate-500">
-            Pro tip: you can also rotate API keys and remove active sessions without deleting the account.
-          </p>
-        </Card>
-      </div>
+      </main>
     </div>
   );
 }
