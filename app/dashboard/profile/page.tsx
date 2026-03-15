@@ -18,6 +18,71 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-['Sora',sans-serif] text-slate-900">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .fu  { animation: fadeUp .4s ease both; }
+        .fu1 { animation-delay:.06s; }
+        .fu2 { animation-delay:.12s; }
+        .fu3 { animation-delay:.18s; }
+        .fu4 { animation-delay:.24s; }
+
+        .field-label { display:block; font-size:12px; font-weight:700; color:#64748b; margin-bottom:6px; }
+        .field-input {
+          width:100%; background:#fff; border:1.5px solid #e2e8f0; border-radius:12px;
+          padding:11px 14px; font-size:14px; font-weight:500; color:#0f172a;
+          font-family:'Sora',sans-serif; outline:none;
+          transition: border-color .2s, box-shadow .2s;
+        }
+        .field-input::placeholder { color:#94a3b8; }
+        .field-input:focus { border-color:#7c3aed; box-shadow:0 0 0 3px rgba(124,58,237,.1); }
+        .field-input:disabled { background:#f8fafc; color:#94a3b8; cursor:not-allowed; }
+
+        .field-select {
+          width:100%; background:#fff; border:1.5px solid #e2e8f0; border-radius:12px;
+          padding:11px 36px 11px 14px; font-size:14px; font-weight:500; color:#0f172a;
+          font-family:'Sora',sans-serif; outline:none; appearance:none; cursor:pointer;
+          transition: border-color .2s, box-shadow .2s;
+        }
+        .field-select:focus { border-color:#7c3aed; box-shadow:0 0 0 3px rgba(124,58,237,.1); }
+
+        .btn-primary {
+          display:inline-flex; align-items:center; gap:8px; justify-content:center;
+          background:#7c3aed; border:none; border-radius:12px; padding:11px 22px;
+          font-size:13px; font-weight:700; color:#fff; cursor:pointer;
+          transition:background .15s, transform .1s; font-family:'Sora',sans-serif;
+        }
+        .btn-primary:hover  { background:#6d28d9; }
+        .btn-primary:active { transform:scale(.97); }
+
+        .btn-secondary {
+          display:inline-flex; align-items:center; gap:8px; justify-content:center;
+          background:#fff; border:1.5px solid #e2e8f0; border-radius:12px;
+          padding:11px 22px; font-size:13px; font-weight:700; color:#1e293b;
+          cursor:pointer; transition:background .15s; font-family:'Sora',sans-serif;
+        }
+        .btn-secondary:hover { background:#f8fafc; }
+
+        .btn-dark {
+          display:inline-flex; align-items:center; gap:8px; justify-content:center;
+          width:100%; background:#0f172a; border:none; border-radius:12px;
+          padding:11px 22px; font-size:13px; font-weight:700; color:#fff;
+          cursor:pointer; transition:background .15s; font-family:'Sora',sans-serif;
+        }
+        .btn-dark:hover { background:#1e293b; }
+
+        .btn-danger {
+          display:inline-flex; align-items:center; gap:8px; justify-content:center;
+          background:#fef2f2; border:1.5px solid #fecaca; border-radius:12px;
+          padding:11px 22px; font-size:13px; font-weight:700; color:#dc2626;
+          cursor:pointer; transition:background .15s; font-family:'Sora',sans-serif;
+        }
+        .btn-danger:hover { background:#fee2e2; }
+
+        .card { background:#fff; border-radius:24px; border:1.5px solid #e2e8f0; padding:28px; }
+        .divider { height:1px; background:#f1f5f9; margin:20px 0; }
+      `}</style>
 
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 

@@ -14,7 +14,59 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-['Sora',sans-serif] text-slate-900">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .fu  { animation: fadeUp .4s ease both; }
+        .fu1 { animation-delay:.06s; }
+        .fu2 { animation-delay:.12s; }
+        .fu3 { animation-delay:.18s; }
+        .fu4 { animation-delay:.24s; }
 
+        .card { background:#fff; border-radius:24px; border:1.5px solid #e2e8f0; padding:28px; }
+        .divider { height:1px; background:#f1f5f9; }
+
+        /* Toggle switch */
+        .toggle-wrap { position:relative; display:inline-block; width:44px; height:26px; flex-shrink:0; }
+        .toggle-wrap input { opacity:0; width:0; height:0; }
+        .toggle-track {
+          position:absolute; inset:0; border-radius:100px; cursor:pointer;
+          background:#e2e8f0; border:1.5px solid #cbd5e1;
+          transition:background .2s, border-color .2s;
+        }
+        .toggle-track::after {
+          content:''; position:absolute; top:3px; left:3px;
+          width:16px; height:16px; border-radius:50%;
+          background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.15);
+          transition:transform .2s;
+        }
+        .toggle-wrap input:checked + .toggle-track { background:#7c3aed; border-color:#7c3aed; }
+        .toggle-wrap input:checked + .toggle-track::after { transform:translateX(18px); }
+        .toggle-wrap input:focus + .toggle-track { box-shadow:0 0 0 3px rgba(124,58,237,.15); }
+
+        .field-select {
+          background:#fff; border:1.5px solid #e2e8f0; border-radius:12px;
+          padding:10px 36px 10px 14px; font-size:13px; font-weight:500; color:#0f172a;
+          font-family:'Sora',sans-serif; outline:none; appearance:none; cursor:pointer;
+          transition:border-color .2s;
+        }
+        .field-select:focus { border-color:#7c3aed; box-shadow:0 0 0 3px rgba(124,58,237,.1); }
+
+        .btn-primary {
+          display:inline-flex; align-items:center; gap:8px; background:#7c3aed;
+          border:none; border-radius:12px; padding:11px 22px; font-size:13px;
+          font-weight:700; color:#fff; cursor:pointer; font-family:'Sora',sans-serif;
+          transition:background .15s, transform .1s;
+        }
+        .btn-primary:hover  { background:#6d28d9; }
+        .btn-primary:active { transform:scale(.97); }
+
+        .row-item { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 0; }
+        .row-item + .row-item { border-top:1px solid #f1f5f9; }
+        .row-label { font-size:14px; font-weight:600; color:#0f172a; }
+        .row-desc  { font-size:12px; color:#94a3b8; margin-top:2px; }
+      `}</style>
 
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
