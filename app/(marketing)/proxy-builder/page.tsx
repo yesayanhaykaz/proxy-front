@@ -87,7 +87,7 @@ export default function ProxyBuilderPage() {
         {/* Heading */}
         <div className="fu mb-12">
           <p className="text-[11px] font-extrabold uppercase tracking-widest text-violet-600 mb-3">Proxy Builder</p>
-          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Build Your Proxy</h1>
+          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Configure Your Proxy</h1>
           <p className="mt-3 text-slate-500 max-w-xl text-sm leading-relaxed">
             Configure your proxy network, location, and traffic. Credentials are generated instantly after purchase.
           </p>
