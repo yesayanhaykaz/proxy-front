@@ -10,7 +10,7 @@ type Sub = {
   status: "Active" | "Expired";
   renewsOn: string;
   usage: { used: number; total: number; unit: "GB" };
-  host?: "103.63.28.207";
+  host?: string;
   port?: number;
   proxy_username?: string;
   proxy_password?: string;
