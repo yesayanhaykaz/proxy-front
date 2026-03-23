@@ -44,7 +44,7 @@ type Testimonial = {
 export function ProxyTypeLanding(props: {
   heroBg?: string;
 
-  typeSlug: "residential" | "mobile" | "datacenter" | "fast";
+  typeSlug: "residential" | "mobile" | "datacenter" | "fast" | "instagram" | "betting" | "scraping" | "sneakers" | "tiktok";
   typeName: string;
   headline: string;
   subheadline: string;
