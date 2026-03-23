@@ -39,7 +39,9 @@ export default async function Page() {
             id: "custom",
               custom: 1,
             title: "Unlimited TikTok Proxy",
-            price: "$29.95 /mo",
+                     network: "residential",
+              protocol: "http",
+     price: "$29.95 /mo",
             popular: true,
             bullets: [
               "Unlimited bandwidth",

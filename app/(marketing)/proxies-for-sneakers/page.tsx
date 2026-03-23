@@ -37,6 +37,8 @@ export default async function Page() {
           {
     id: "custom",
               custom: 1,
+              network: "residential",
+              protocol: "http",
             title: "Unlimited Sneaker Proxy",
             price: "$29.95 /mo",
             popular: true,

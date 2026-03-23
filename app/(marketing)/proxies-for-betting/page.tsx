@@ -40,6 +40,8 @@ export default async function Page() {
             title: "Unlimited Betting Proxy",
             price: "$29.95 /mo",
             popular: true,
+              network: "residential",
+              protocol: "http",
             bullets: [
               "Unlimited bandwidth",
               "Rotating & sticky sessions",

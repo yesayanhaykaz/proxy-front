@@ -40,7 +40,9 @@ export default async function Page() {
               custom: 1,
             price: "$29.95 /mo",
             popular: true,
-            bullets: [
+                      network: "residential",
+              protocol: "http",
+    bullets: [
               "Unlimited bandwidth",
               "Rotating & sticky sessions",
               "HTTP/SOCKS5",

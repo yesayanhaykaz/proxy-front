@@ -39,7 +39,9 @@ export default async function Page() {
               custom: 1,
             title: "Unlimited Scraping Proxy",
             price: "$29.95 /mo",
-            popular: true,
+                        network: "residential",
+              protocol: "http",
+  popular: true,
             bullets: [
               "Unlimited bandwidth",
               "Per-request & timed rotation",
