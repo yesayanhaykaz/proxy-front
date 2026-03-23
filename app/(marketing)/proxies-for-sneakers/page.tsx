@@ -35,7 +35,7 @@ export default async function Page() {
       ? previewPlans
       : [
           {
-            id: "sneakers-unlimited",
+    id: "custom",
             title: "Unlimited Sneaker Proxy",
             price: "$29.95 /mo",
             popular: true,

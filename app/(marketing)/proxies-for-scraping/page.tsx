@@ -35,7 +35,7 @@ export default async function Page() {
       ? previewPlans
       : [
           {
-            id: "scraping-unlimited",
+    id: "custom",
             title: "Unlimited Scraping Proxy",
             price: "$29.95 /mo",
             popular: true,

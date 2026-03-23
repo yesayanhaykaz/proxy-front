@@ -35,7 +35,7 @@ export default async function Page() {
       ? previewPlans
       : [
           {
-            id: "betting-unlimited",
+    id: "custom",
             title: "Unlimited Betting Proxy",
             price: "$29.95 /mo",
             popular: true,

@@ -15,7 +15,7 @@ export default async function Page() {
   const plans = r.ok ? await r.json() : [];
 
   const previewPlans = (Array.isArray(plans) ? plans : []).slice(0, 3).map((p: any, idx: number) => ({
-    id: p.id,
+    id: "custom",
     title: p.name,
     price: `$${Number(p.price || 0).toFixed(2)} ${p.priceUnit || "/mo"}`,
     popular: Boolean(p.popular) || idx === 1,
