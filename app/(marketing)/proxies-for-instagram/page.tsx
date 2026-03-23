@@ -37,6 +37,7 @@ export default async function Page() {
           {
     id: "custom",
             title: "Unlimited Instagram Proxy",
+              custom: 1,
             price: "$29.95 /mo",
             popular: true,
             bullets: [

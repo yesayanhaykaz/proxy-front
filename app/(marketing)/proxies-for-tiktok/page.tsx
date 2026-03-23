@@ -15,7 +15,7 @@ export default async function Page() {
   const plans = r.ok ? await r.json() : [];
 
   const previewPlans = (Array.isArray(plans) ? plans : []).slice(0, 3).map((p: any, idx: number) => ({
-    id: "custom",
+    id: p.id,
     title: p.name,
     price: `$${Number(p.price || 0).toFixed(2)} ${p.priceUnit || "/mo"}`,
     popular: Boolean(p.popular) || idx === 1,
@@ -36,7 +36,8 @@ export default async function Page() {
       ? previewPlans
       : [
           {
-            id: "tiktok-unlimited",
+            id: "custom",
+              custom: 1,
             title: "Unlimited TikTok Proxy",
             price: "$29.95 /mo",
             popular: true,
