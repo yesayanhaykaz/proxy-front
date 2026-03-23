@@ -42,7 +42,8 @@ export default async function Page() {
                         network: "residential",
               protocol: "http",
   popular: true,
-            bullets: [
+        href: `/checkout?plan=custom&network=residential&protocol=http&session=sticky&traffic=15`,
+      bullets: [
               "Unlimited bandwidth",
               "Per-request & timed rotation",
               "HTTP/SOCKS5",

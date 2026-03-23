@@ -49,7 +49,8 @@ export default async function Page() {
               "Instagram-safe IP pool",
               "Instant activation",
             ],
-            bestFor: ["Instagram automation", "Multi-account management", "DM campaigns"],
+           href: `/checkout?plan=custom&network=residential&protocol=http&session=sticky&traffic=15`,
+   bestFor: ["Instagram automation", "Multi-account management", "DM campaigns"],
           },
         ];
 

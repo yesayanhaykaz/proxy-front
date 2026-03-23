@@ -41,7 +41,7 @@ export default async function Page() {
             price: "$29.95 /mo",
             popular: true,
               network: "residential",
-              protocol: "http",
+  href: `/checkout?plan=custom&network=residential&protocol=http&session=sticky&traffic=15`,
             bullets: [
               "Unlimited bandwidth",
               "Rotating & sticky sessions",
