@@ -27,7 +27,7 @@ export default async function Page() {
       "All bots supported",
     ],
     bestFor: ["Nike SNKRS", "Adidas drops", "Supreme & Footsites"],
-    href: `/pricing?type=sneakers#plans`,
+  href: `/checkout?plan=custom&network=residential&protocol=http&session=sticky&traffic=15`,
   }));
 
   const displayPlans =

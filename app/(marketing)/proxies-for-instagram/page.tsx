@@ -27,7 +27,7 @@ export default async function Page() {
       "Instant activation",
     ],
     bestFor: ["Instagram automation", "Multi-account management", "DM campaigns"],
-    href: `/pricing?type=instagram#plans`,
+  href: `/checkout?plan=custom&network=residential&protocol=http&session=sticky&traffic=15`,
   }));
 
   const displayPlans =

@@ -27,7 +27,7 @@ export default async function Page() {
       "Instant activation",
     ],
     bestFor: ["TikTok automation", "Multi-account management", "Content scraping"],
-    href: `/pricing?type=tiktok#plans`,
+  href: `/checkout?plan=custom&network=residential&protocol=http&session=sticky&traffic=15`,
   }));
 
   // Fallback preview plan when no plans are returned from the API

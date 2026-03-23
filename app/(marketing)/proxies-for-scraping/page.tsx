@@ -27,7 +27,7 @@ export default async function Page() {
       "Unlimited concurrency",
     ],
     bestFor: ["Data scraping pipelines", "E-commerce monitoring", "SEO tracking"],
-    href: `/pricing?type=scraping#plans`,
+  href: `/checkout?plan=custom&network=residential&protocol=http&session=sticky&traffic=15`,
   }));
 
   const displayPlans =
