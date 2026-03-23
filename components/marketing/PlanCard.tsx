@@ -34,7 +34,7 @@ const handleBuy = () => {
   const isLoggedIn = document.cookie.includes("ps_session=");
   const checkoutUrl = href ?? `/checkout?plan=${encodeURIComponent(id)}`;
   if (!isLoggedIn) {
-    router.push(`/checkout?plan=${encodeURIComponent(id)}`);
+    router.push(href ?? `/checkout?plan=${encodeURIComponent(id)}`);
     return;
   }
   router.push(checkoutUrl);
