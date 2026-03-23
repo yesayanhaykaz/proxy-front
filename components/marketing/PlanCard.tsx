@@ -17,6 +17,7 @@ type PreviewPlan = {
 };
 
 export function PlanCard({
+    id,
   typeSlug,
   title,
   price,
@@ -29,15 +30,15 @@ export function PlanCard({
 }: PreviewPlan & { typeSlug: string }) {
   const router = useRouter();
 
-  const handleBuy = () => {
-    const isLoggedIn = document.cookie.includes("ps_session=");
-    const checkoutUrl = href ?? `/checkout?plan=${encodeURIComponent(title)}&type=${typeSlug}`;
-    if (!isLoggedIn) {
-      router.push(`/auth/login?next=${encodeURIComponent(checkoutUrl)}`);
-      return;
-    }
-    router.push(checkoutUrl);
-  };
+const handleBuy = () => {
+  const isLoggedIn = document.cookie.includes("ps_session=");
+  const checkoutUrl = href ?? `/checkout?plan=${encodeURIComponent(id)}`;
+  if (!isLoggedIn) {
+    router.push(`/auth/login?next=${encodeURIComponent(checkoutUrl)}`);
+    return;
+  }
+  router.push(checkoutUrl);
+};
 
   const defaultBadges =
     badges?.length

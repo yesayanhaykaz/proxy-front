@@ -47,7 +47,6 @@ export default async function Page() {
               "All bots supported",
             ],
             bestFor: ["Nike SNKRS", "Adidas drops", "Supreme & Footsites"],
-            href: `/pricing?type=sneakers#plans`,
           },
         ];
 

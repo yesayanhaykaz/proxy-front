@@ -47,7 +47,6 @@ export default async function Page() {
               "Instant activation",
             ],
             bestFor: ["Instagram automation", "Multi-account management", "DM campaigns"],
-            href: `/pricing?type=instagram#plans`,
           },
         ];
 

@@ -48,7 +48,6 @@ export default async function Page() {
               "Instant activation",
             ],
             bestFor: ["TikTok automation", "Multi-account management", "Content scraping"],
-            href: `/pricing?type=tiktok#plans`,
           },
         ];
 

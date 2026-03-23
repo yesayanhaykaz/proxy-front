@@ -47,7 +47,6 @@ export default async function Page() {
               "Bookmaker-safe IPs",
             ],
             bestFor: ["Odds scraping", "Geo-restricted bookmakers", "Arbitrage software"],
-            href: `/pricing?type=betting#plans`,
           },
         ];
 
