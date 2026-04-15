@@ -1,22 +1,24 @@
 import Link from "next/link";
 import {
-  Check,
-  ShieldCheck,
-  Zap,
-  Headphones,
-  ChevronUp,
-  Star,
-  Quote,
-  MessageCircle,
-  ArrowRight,
-  Sparkles,
   Activity,
+  ArrowRight,
   Bot,
+  Check,
+  ChevronUp,
   Gauge,
+  Headphones,
+  MessageCircle,
+  Quote,
   Server,
-  Wrench,
   Shield,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Wrench,
+  Zap,
 } from "lucide-react";
+import { localizeHref, type Locale } from "@/lib/i18n";
+import { PlanCard } from "@/components/marketing/PlanCard";
 
 type PreviewPlan = {
   id: string;
@@ -38,50 +40,90 @@ type Testimonial = {
   role?: string;
   quote: string;
   rating?: 1 | 2 | 3 | 4 | 5;
-  avatarUrl?: string; // optional
+  avatarUrl?: string;
+};
+
+type Labels = {
+  buyNow?: string;
+  viewAllPlans?: string;
+  secureCheckout?: string;
+  instantActivation?: string;
+  liveSupport?: string;
+  supportOnline?: string;
+  askUs?: string;
+  popularPlans?: string;
+  planIntro?: string;
+  allPlansCta?: string;
+  performanceComparison?: string;
+  feature?: string;
+  regularProxies?: string;
+  useCases?: string;
+  useCasesTitle?: string;
+  useCasesSubtitle?: string;
+  benefits?: string;
+  benefitsTitle?: string;
+  benefitsSubtitle?: string;
+  trustedBy?: string;
+  trustedByBody?: string;
+  talkToSales?: string;
+  faq?: string;
+  faqAnswerSoon?: string;
+  finalTitle?: string;
+  finalBody?: string;
+  finalButton?: string;
+  explore?: string;
+  pricing?: string;
+  blog?: string;
+  contact?: string;
+  mostPopular?: string;
+  bestValue?: string;
+  bestFor?: string;
 };
 
 export function ProxyTypeLanding(props: {
   heroBg?: string;
-
-  typeSlug: "residential" | "mobile" | "datacenter" | "fast" | "instagram" | "betting" | "scraping" | "sneakers" | "tiktok";
+  typeSlug:
+    | "residential"
+    | "mobile"
+    | "datacenter"
+    | "fast"
+    | "instagram"
+    | "betting"
+    | "scraping"
+    | "sneakers"
+    | "tiktok";
   typeName: string;
   headline: string;
   subheadline: string;
   ctaHref: string;
   secondaryCtaHref?: string;
   secondaryCtaText?: string;
-
   previewPlans: PreviewPlan[];
   rows: Row[];
   faqs: FAQ[];
-
   useCases?: { title: string; desc: string }[];
   benefits?: { title: string; desc: string }[];
-
-  // New: testimonials section (replaces locations)
   testimonials?: Testimonial[];
-
   lastCtaTitle?: string;
   lastCtaDesc?: string;
   lastCtaHref?: string;
-
   schema?: {
     pageName: string;
     description: string;
     urlPath: string;
   };
+  locale?: Locale;
+  labels?: Labels;
 }) {
   const {
     heroBg = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=80",
-
     typeSlug,
     typeName,
     headline,
     subheadline,
     ctaHref,
     secondaryCtaHref = "/pricing",
-    secondaryCtaText = "View all plans",
+    secondaryCtaText,
     previewPlans,
     rows,
     faqs,
@@ -92,7 +134,57 @@ export function ProxyTypeLanding(props: {
     lastCtaDesc = "Instant setup, clean routing, and stable performance.",
     lastCtaHref = ctaHref,
     schema,
+    locale = "en",
+    labels,
   } = props;
+
+  const copy = {
+    buyNow: labels?.buyNow || "Buy now",
+    viewAllPlans: labels?.viewAllPlans || "View all plans",
+    secureCheckout: labels?.secureCheckout || "Secure checkout",
+    instantActivation: labels?.instantActivation || "Instant activation",
+    liveSupport: labels?.liveSupport || "Live support",
+    supportOnline: labels?.supportOnline || "Support is online",
+    askUs:
+      labels?.askUs ||
+      "Ask us about targeting, rotation, and the best plan for your workflow.",
+    popularPlans: labels?.popularPlans || "Popular plans",
+    planIntro: labels?.planIntro || "Start small or scale fast — upgrade anytime.",
+    allPlansCta: labels?.allPlansCta || `See all ${typeName} plans`,
+    performanceComparison:
+      labels?.performanceComparison || "Performance comparison",
+    feature: labels?.feature || "Feature",
+    regularProxies: labels?.regularProxies || "Regular proxies",
+    useCases: labels?.useCases || "Use cases",
+    useCasesTitle:
+      labels?.useCasesTitle || `What ${typeName.toLowerCase()} are best for`,
+    useCasesSubtitle:
+      labels?.useCasesSubtitle ||
+      "Designed for reliable automation, scraping, and geo workflows.",
+    benefits: labels?.benefits || "Why teams choose this setup",
+    benefitsTitle: labels?.benefitsTitle || "Built for stable performance",
+    benefitsSubtitle:
+      labels?.benefitsSubtitle ||
+      "Clean provisioning, consistent routing, and support that helps you move faster.",
+    trustedBy: labels?.trustedBy || "Trusted by thousands",
+    trustedByBody:
+      labels?.trustedByBody ||
+      `Here’s what customers say about our ${typeName.toLowerCase()}.`,
+    talkToSales: labels?.talkToSales || "Talk to sales",
+    faq: labels?.faq || "Frequently asked questions",
+    faqAnswerSoon:
+      labels?.faqAnswerSoon || "Answer coming soon. Contact support for details.",
+    finalTitle: labels?.finalTitle || lastCtaTitle,
+    finalBody: labels?.finalBody || lastCtaDesc,
+    finalButton: labels?.finalButton || "Buy now",
+    explore: labels?.explore || "Explore",
+    pricing: labels?.pricing || "Pricing",
+    blog: labels?.blog || "Blog",
+    contact: labels?.contact || "Contact",
+    mostPopular: labels?.mostPopular || "Most popular",
+    bestValue: labels?.bestValue || "Best value",
+    bestFor: labels?.bestFor || "Best for",
+  };
 
   const jsonLd =
     schema &&
@@ -104,9 +196,10 @@ export function ProxyTypeLanding(props: {
       url: `https://proxiesseller.cc${schema.urlPath}`,
       isPartOf: {
         "@type": "WebSite",
-        name: "ProxiesSeller",
+        name: "Proxiesseller",
         url: "https://proxiesseller.cc",
       },
+      inLanguage: locale,
       about: {
         "@type": "Service",
         name: typeName,
@@ -114,11 +207,22 @@ export function ProxyTypeLanding(props: {
       },
     });
 
-  // tasteful “live” micro UX blocks (no fake numbers)
   const liveSignals = [
-    { icon: ShieldCheck, title: "Secure checkout", desc: "TLS protected payments and account security." },
-    { icon: Zap, title: "Instant activation", desc: "Plans provisioned immediately after purchase." },
-    { icon: Headphones, title: "Live support", desc: "Chat with support when you need help." },
+    {
+      icon: ShieldCheck,
+      title: copy.secureCheckout,
+      desc: "TLS protected payments and account security.",
+    },
+    {
+      icon: Zap,
+      title: copy.instantActivation,
+      desc: "Plans provisioned immediately after purchase.",
+    },
+    {
+      icon: Headphones,
+      title: copy.liveSupport,
+      desc: "Chat with support when you need help.",
+    },
   ];
 
   return (
@@ -127,7 +231,6 @@ export function ProxyTypeLanding(props: {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
       ) : null}
 
-      {/* HERO */}
       <section className="relative overflow-hidden bg-slate-950">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-35"
@@ -135,7 +238,6 @@ export function ProxyTypeLanding(props: {
           aria-hidden="true"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/55 via-slate-950/55 to-slate-950/85" />
-
         <div className="absolute inset-0" aria-hidden="true">
           <div className="absolute -top-32 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-indigo-500/20 blur-3xl" />
           <div className="absolute -bottom-40 right-[-120px] h-[520px] w-[520px] rounded-full bg-sky-500/15 blur-3xl" />
@@ -159,32 +261,31 @@ export function ProxyTypeLanding(props: {
 
             <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
-                href={ctaHref}
+                href={localizeHref(locale, ctaHref)}
                 className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-extrabold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500"
               >
-                Buy Now <ArrowRight className="ml-2 h-4 w-4" />
+                {copy.buyNow} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
 
               <Link
-                href={secondaryCtaHref}
+                href={localizeHref(locale, secondaryCtaHref)}
                 className="inline-flex items-center justify-center rounded-2xl border border-white/12 bg-white/6 px-6 py-3 text-sm font-extrabold text-white/90 shadow-sm transition hover:bg-white/10"
               >
-                {secondaryCtaText}
+                {secondaryCtaText || copy.viewAllPlans}
               </Link>
             </div>
 
-            {/* Trust row (icons only) */}
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              {liveSignals.map((s) => (
+              {liveSignals.map((signal) => (
                 <div
-                  key={s.title}
+                  key={signal.title}
                   className="rounded-2xl border border-white/12 bg-white/6 p-4 text-left backdrop-blur-sm transition hover:bg-white/10"
                 >
                   <div className="flex items-center gap-2">
-                    <s.icon className="h-4 w-4 text-slate-200" />
-                    <div className="text-xs font-extrabold text-white">{s.title}</div>
+                    <signal.icon className="h-4 w-4 text-slate-200" />
+                    <div className="text-xs font-extrabold text-white">{signal.title}</div>
                   </div>
-                  <div className="mt-2 text-xs font-semibold text-slate-300">{s.desc}</div>
+                  <div className="mt-2 text-xs font-semibold text-slate-300">{signal.desc}</div>
                 </div>
               ))}
             </div>
@@ -192,142 +293,135 @@ export function ProxyTypeLanding(props: {
             <div className="mt-6 flex items-center justify-center gap-3 text-xs font-semibold text-slate-300">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/6 px-3 py-1">
                 <MessageCircle className="h-4 w-4 text-slate-200" />
-                Support is online
+                {copy.supportOnline}
               </span>
               <span className="text-slate-500">•</span>
-              <span>Ask us about targeting, rotation, and best plan for your case</span>
+              <span>{copy.askUs}</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* POPULAR PLANS */}
       <section className="mx-auto max-w-6xl px-4 py-12">
         <div className="flex items-end justify-between gap-6">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-900">Popular plans</h2>
-            <p className="mt-2 text-sm font-semibold text-slate-600">
-              Start small or scale fast — upgrade anytime.
-            </p>
+            <h2 className="text-xl font-extrabold text-slate-900">{copy.popularPlans}</h2>
+            <p className="mt-2 text-sm font-semibold text-slate-600">{copy.planIntro}</p>
           </div>
           <Link
-            href={`${ctaHref}#plans`}
+            href={localizeHref(locale, `${ctaHref}#plans`)}
             className="text-sm font-extrabold text-indigo-600 hover:text-indigo-500"
           >
-            See all {typeName} plans →
+            {copy.allPlansCta} →
           </Link>
         </div>
 
         <div className="mt-6 grid gap-6 md:grid-cols-3">
-          {previewPlans.map((p) => (
+          {previewPlans.map((plan) => (
             <PlanCard
-              key={p.id}
+              key={plan.id}
               typeSlug={typeSlug}
-              {...p}
-              href={p.href ?? `/checkout?plan=${encodeURIComponent(p.id)}&mode=register`}
+              {...plan}
+              href={plan.href ?? `/checkout?plan=${encodeURIComponent(plan.id)}&mode=register`}
+              labels={{
+                mostPopular: copy.mostPopular,
+                bestValue: copy.bestValue,
+                bestFor: copy.bestFor,
+                buyNow: copy.buyNow,
+              }}
             />
           ))}
         </div>
       </section>
 
-      {/* PERFORMANCE COMPARISON */}
       <section className="mx-auto max-w-6xl px-4 pb-12">
-        <h2 className="text-2xl font-extrabold text-slate-900 text-center">
-          Performance comparison
+        <h2 className="text-center text-2xl font-extrabold text-slate-900">
+          {copy.performanceComparison}
         </h2>
 
         <div className="mt-6 overflow-hidden rounded-3xl border border-slate-200 bg-white">
           <div className="grid grid-cols-3 bg-slate-50 px-6 py-4 text-xs font-extrabold text-slate-600">
-            <div>Feature</div>
+            <div>{copy.feature}</div>
             <div className="text-indigo-600">{typeName}</div>
-            <div>Regular proxies</div>
+            <div>{copy.regularProxies}</div>
           </div>
 
           <div className="divide-y divide-slate-200">
-            {rows.map((r) => (
-              <div key={r.feature} className="grid grid-cols-3 px-6 py-4 text-sm">
-                <div className="font-bold text-slate-700">{r.feature}</div>
-                <div className="font-extrabold text-slate-900">{r.left}</div>
-                <div className="font-semibold text-slate-600">{r.right}</div>
+            {rows.map((row) => (
+              <div key={row.feature} className="grid grid-cols-3 px-6 py-4 text-sm">
+                <div className="font-bold text-slate-700">{row.feature}</div>
+                <div className="font-extrabold text-slate-900">{row.left}</div>
+                <div className="font-semibold text-slate-600">{row.right}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      {useCases.length ? (
+        <ModernGridSection
+          locale={locale}
+          kicker={copy.useCases}
+          title={copy.useCasesTitle}
+          subtitle={copy.useCasesSubtitle}
+          items={useCases.map((item, index) => ({
+            title: item.title,
+            desc: item.desc,
+            icon:
+              typeSlug === "datacenter"
+                ? [Gauge, Bot, Server, Activity, Shield, Wrench][index % 6]
+                : typeSlug === "mobile"
+                ? [Bot, Shield, Activity, Gauge, Server, Wrench][index % 6]
+                : typeSlug === "residential"
+                ? [Shield, Activity, Bot, Gauge, Server, Wrench][index % 6]
+                : [Gauge, Activity, Bot, Server, Shield, Wrench][index % 6],
+            tone: index % 3 === 0 ? "indigo" : index % 3 === 1 ? "sky" : "emerald",
+          }))}
+          ctaLabel={copy.pricing}
+        />
+      ) : null}
 
+      {benefits.length ? (
+        <ModernGridSection
+          locale={locale}
+          kicker={copy.benefits}
+          title={copy.benefitsTitle}
+          subtitle={copy.benefitsSubtitle}
+          items={benefits.map((item, index) => ({
+            title: item.title,
+            desc: item.desc,
+            icon: [ShieldCheck, Zap, Headphones][index % 3],
+            tone: index % 3 === 0 ? "indigo" : index % 3 === 1 ? "sky" : "emerald",
+          }))}
+          ctaLabel={copy.pricing}
+        />
+      ) : null}
 
-      {/* USE CASES (modern) */}
-{useCases.length ? (
-  <ModernGridSection
-    kicker="Use cases"
-    title={`What ${typeName.toLowerCase()} are best for`}
-    subtitle="Designed for reliable automation, scraping, and geo workflows — with predictable performance."
-    items={useCases.map((c, i) => ({
-      title: c.title,
-      desc: c.desc,
-      icon:
-        typeSlug === "datacenter"
-          ? [Gauge, Bot, Server, Activity, Shield, Wrench][i % 6]
-          : typeSlug === "mobile"
-          ? [Bot, Shield, Activity, Gauge, Server, Wrench][i % 6]
-          : typeSlug === "residential"
-          ? [Shield, Activity, Bot, Gauge, Server, Wrench][i % 6]
-          : [Gauge, Activity, Bot, Server, Shield, Wrench][i % 6],
-      tone:
-        i % 3 === 0 ? "indigo" : i % 3 === 1 ? "sky" : "emerald",
-      featured: i === 1 && typeSlug === "datacenter",
-    }))}
-  />
-) : null}
-
-{/* BENEFITS (modern) */}
-{benefits.length ? (
-  <ModernGridSection
-    kicker="Why ProxiesSeller"
-    title="Built for stable performance"
-    subtitle="Clean provisioning, consistent routing, and support that helps you ship faster."
-    items={benefits.map((b, i) => ({
-      title: b.title,
-      desc: b.desc,
-      icon: [ShieldCheck, Zap, Headphones][i % 3],
-      tone: i % 3 === 0 ? "indigo" : i % 3 === 1 ? "sky" : "emerald",
-    }))}
-  />
-) : null}
-
-
-
-
-
-      {/* TESTIMONIALS (replaces Global coverage) */}
       {testimonials.length ? (
         <section className="mx-auto max-w-6xl px-4 pb-12">
           <div className="flex items-end justify-between gap-6">
             <div>
-              <h2 className="text-3xl font-extrabold text-slate-900">Trusted by thousands</h2>
-              <p className="mt-2 text-sm font-semibold text-slate-600">
-                Here’s what customers say about our {typeName.toLowerCase()}.
-              </p>
+              <h2 className="text-3xl font-extrabold text-slate-900">{copy.trustedBy}</h2>
+              <p className="mt-2 text-sm font-semibold text-slate-600">{copy.trustedByBody}</p>
             </div>
 
             <Link
-              href="/contact"
+              href={localizeHref(locale, "/contact")}
               className="inline-flex items-center gap-2 text-sm font-extrabold text-indigo-600 hover:text-indigo-500"
             >
-              Talk to sales <ArrowRight className="h-4 w-4" />
+              {copy.talkToSales} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
           <div className="mt-6 grid gap-6 md:grid-cols-2">
-            {testimonials.slice(0, 4).map((t, idx) => (
+            {testimonials.slice(0, 4).map((testimonial, index) => (
               <div
-                key={`${t.name}-${idx}`}
+                key={`${testimonial.name}-${index}`}
                 className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition hover:shadow-md"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
-                    {Array.from({ length: t.rating ?? 5 }).map((_, i) => (
+                    {Array.from({ length: testimonial.rating ?? 5 }).map((_, i) => (
                       <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
@@ -335,26 +429,22 @@ export function ProxyTypeLanding(props: {
                 </div>
 
                 <p className="mt-4 text-base font-semibold leading-relaxed text-slate-700">
-                  “{t.quote}”
+                  “{testimonial.quote}”
                 </p>
 
                 <div className="mt-6 flex items-center gap-3">
-                  {t.avatarUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={t.avatarUrl}
-                      alt={t.name}
-                      className="h-10 w-10 rounded-full object-cover ring-2 ring-slate-100"
-                    />
-                  ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-extrabold text-slate-700">
-                      {t.name.split(" ").map((x) => x[0]).slice(0, 2).join("")}
-                    </div>
-                  )}
-
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-extrabold text-slate-700">
+                    {testimonial.name
+                      .split(" ")
+                      .map((part) => part[0])
+                      .slice(0, 2)
+                      .join("")}
+                  </div>
                   <div>
-                    <div className="text-sm font-extrabold text-slate-900">{t.name}</div>
-                    {t.role ? <div className="text-xs font-semibold text-slate-500">{t.role}</div> : null}
+                    <div className="text-sm font-extrabold text-slate-900">{testimonial.name}</div>
+                    {testimonial.role ? (
+                      <div className="text-xs font-semibold text-slate-500">{testimonial.role}</div>
+                    ) : null}
                   </div>
                 </div>
               </div>
@@ -363,57 +453,53 @@ export function ProxyTypeLanding(props: {
         </section>
       ) : null}
 
-      {/* FAQ */}
       <section className="mx-auto max-w-6xl px-4 pb-12">
-        <h2 className="text-2xl font-extrabold text-slate-900 text-center">
-          Frequently asked questions
-        </h2>
+        <h2 className="text-center text-2xl font-extrabold text-slate-900">{copy.faq}</h2>
 
         <div className="mx-auto mt-6 max-w-3xl space-y-3">
-          {faqs.map((f) => (
+          {faqs.map((faq) => (
             <details
-              key={f.q}
+              key={faq.q}
               className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
             >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
-                <span className="text-sm font-extrabold text-slate-900">{f.q}</span>
+                <span className="text-sm font-extrabold text-slate-900">{faq.q}</span>
                 <ChevronUp className="h-5 w-5 text-slate-400 transition group-open:rotate-180" />
               </summary>
               <p className="mt-3 text-sm font-semibold text-slate-600">
-                {f.a ?? "Answer coming soon. Contact support for details."}
+                {faq.a ?? copy.faqAnswerSoon}
               </p>
             </details>
           ))}
         </div>
       </section>
 
-      {/* FINAL CTA */}
       <section className="mx-auto max-w-6xl px-4 pb-16">
         <div className="rounded-3xl border border-slate-200 bg-slate-50 p-10 text-center">
-          <h2 className="text-2xl font-extrabold text-slate-900">{lastCtaTitle}</h2>
-          <p className="mt-2 text-sm font-semibold text-slate-600">{lastCtaDesc}</p>
+          <h2 className="text-2xl font-extrabold text-slate-900">{copy.finalTitle}</h2>
+          <p className="mt-2 text-sm font-semibold text-slate-600">{copy.finalBody}</p>
 
           <div className="mt-6">
             <Link
-              href={lastCtaHref}
+              href={localizeHref(locale, lastCtaHref)}
               className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-7 py-3 text-sm font-extrabold text-white shadow-sm transition hover:bg-indigo-500"
             >
-              Buy Now →
+              {copy.finalButton} →
             </Link>
           </div>
 
           <p className="mt-5 text-xs font-semibold text-slate-500">
-            Explore:{" "}
-            <Link className="underline hover:text-slate-900" href="/pricing">
-              Pricing
+            {copy.explore}:{" "}
+            <Link className="underline hover:text-slate-900" href={localizeHref(locale, "/pricing")}>
+              {copy.pricing}
             </Link>{" "}
             ·{" "}
-            <Link className="underline hover:text-slate-900" href="/blog">
-              Blog
+            <Link className="underline hover:text-slate-900" href={localizeHref(locale, "/blog")}>
+              {copy.blog}
             </Link>{" "}
             ·{" "}
-            <Link className="underline hover:text-slate-900" href="/contact">
-              Contact
+            <Link className="underline hover:text-slate-900" href={localizeHref(locale, "/contact")}>
+              {copy.contact}
             </Link>
           </p>
         </div>
@@ -422,13 +508,11 @@ export function ProxyTypeLanding(props: {
   );
 }
 
-
 type ModernCard = {
   title: string;
   desc: string;
   icon: any;
   tone?: "indigo" | "sky" | "emerald" | "slate";
-  featured?: boolean;
 };
 
 function toneClasses(tone: ModernCard["tone"]) {
@@ -465,12 +549,14 @@ function toneClasses(tone: ModernCard["tone"]) {
 }
 
 function ModernGridSection(props: {
+  locale: Locale;
   kicker: string;
   title: string;
   subtitle: string;
   items: ModernCard[];
+  ctaLabel: string;
 }) {
-  const { kicker, title, subtitle, items } = props;
+  const { locale, kicker, title, subtitle, items, ctaLabel } = props;
 
   return (
     <section className="mx-auto max-w-6xl px-4 pb-12">
@@ -480,66 +566,46 @@ function ModernGridSection(props: {
             <Sparkles className="h-4 w-4 text-indigo-600" />
             {kicker}
           </div>
-          <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900">
-            {title}
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm font-semibold text-slate-600">
-            {subtitle}
-          </p>
+          <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900">{title}</h2>
+          <p className="mt-2 max-w-2xl text-sm font-semibold text-slate-600">{subtitle}</p>
         </div>
 
         <Link
-          href="/pricing"
+          href={localizeHref(locale, "/pricing")}
           className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-extrabold text-slate-900 shadow-sm transition hover:bg-slate-50"
         >
-          View pricing <ArrowRight className="h-4 w-4" />
+          {ctaLabel} <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
 
       <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {items.map((it) => {
-          const t = toneClasses(it.tone);
-
+        {items.map((item) => {
+          const tone = toneClasses(item.tone);
           return (
             <div
-              key={it.title}
+              key={item.title}
               className={[
                 "group relative overflow-hidden rounded-3xl border bg-white p-6 transition",
                 "shadow-[0_10px_40px_rgba(15,23,42,0.06)] hover:-translate-y-0.5",
-                t.border,
-                t.shadow,
-                it.featured ? "ring-1 ring-indigo-100" : "",
+                tone.border,
+                tone.shadow,
               ].join(" ")}
             >
-              {/* top gradient */}
               <div
-                className={[
-                  "absolute inset-x-0 top-0 h-24 bg-gradient-to-b to-transparent",
-                  t.top,
-                ].join(" ")}
+                className={["absolute inset-x-0 top-0 h-24 bg-gradient-to-b to-transparent", tone.top].join(" ")}
                 aria-hidden="true"
               />
-
-              <div className="relative flex items-start gap-4">
-                <div className={["flex h-11 w-11 items-center justify-center rounded-2xl", t.icon].join(" ")}>
-                  <it.icon className="h-5 w-5" />
+              <div className="relative">
+                <div className={["inline-flex h-12 w-12 items-center justify-center rounded-2xl", tone.icon].join(" ")}>
+                  <item.icon className="h-5 w-5" />
                 </div>
-
-                <div className="min-w-0">
-                  <div className="text-base font-extrabold text-slate-900">
-                    {it.title}
-                  </div>
-                  <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-600">
-                    {it.desc}
-                  </p>
+                <h3 className="mt-5 text-lg font-extrabold text-slate-950">{item.title}</h3>
+                <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-600">{item.desc}</p>
+                <div className="mt-6 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                  <Check className="h-4 w-4" />
+                  Proxy-ready
                 </div>
               </div>
-
-              {it.featured ? (
-                <div className="relative mt-5 rounded-2xl border border-indigo-200/60 bg-indigo-50/60 px-4 py-3 text-xs font-extrabold text-indigo-700">
-                  Recommended for high-concurrency automation and fast throughput.
-                </div>
-              ) : null}
             </div>
           );
         })}
@@ -547,5 +613,3 @@ function ModernGridSection(props: {
     </section>
   );
 }
-
-import { PlanCard } from "./PlanCard";

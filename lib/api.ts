@@ -1,3 +1,8 @@
+import {
+  getBrowserApiBase,
+  getSiteOrigin as getDefaultSiteOrigin,
+} from "@/lib/env";
+
 export type ProxyPlan = {
   id: number;
   type: string;
@@ -10,24 +15,11 @@ export type ProxyPlan = {
 };
 
 function getSiteOrigin() {
-  // Prefer an explicit site URL (best for production)
-  const explicit =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.SITE_URL ||
-    "";
-
-  if (explicit) return explicit.replace(/\/+$/, "");
-
-  // Vercel provides VERCEL_URL without protocol
-  const vercel = process.env.VERCEL_URL;
-  if (vercel) return `https://${vercel}`;
-
-  // Local dev fallback
-  return "http://localhost:3000";
+  return getDefaultSiteOrigin();
 }
 
 function apiBase() {
-  const base = process.env.NEXT_PUBLIC_API_BASE || "/api";
+  const base = getBrowserApiBase();
 
   // If user provided full URL like https://domain.com/api
   if (base.startsWith("http://") || base.startsWith("https://")) {
@@ -61,4 +53,3 @@ export async function apiGet<T>(path: string): Promise<T> {
 
   return res.json() as Promise<T>;
 }
-

@@ -2,34 +2,9 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import SubscriptionDetailClient from "./SubscriptionDetailClient";
+import { getPurchaseById, type Purchase } from "@/lib/purchases";
 
 export const dynamic = "force-dynamic";
-
-type Purchase = {
-  purchase_id: string;
-  package_name: string;
-  category: string;
-  status: "active" | "expired";
-  created_at: string;
-  price_cents?: number;
-  proxy_username?: string;
-  proxy_password?: string;
-  host?: string;
-  port?: number;
-  protocol?: string;
-};
-
-async function getPurchase(userId: string, id: string): Promise<Purchase | null> {
-  if (!userId) return null;
-  const res = await fetch("https://api.proxiesseller.cc/api/purchases", {
-    headers: { "X-User-Id": userId },
-    cache: "no-store",
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  const purchases: Purchase[] = data.purchases || [];
-  return purchases.find((p) => p.purchase_id === id) ?? null;
-}
 
 const TYPE_CONFIG: Record<string, { border: string; bg: string; badge: string; dot: string; bar: string; faIcon: string; iconColor: string; label: string }> = {
   residential: { border: "border-violet-200", bg: "bg-violet-50/40", badge: "bg-violet-100 text-violet-700 border-violet-200", dot: "bg-violet-500", bar: "bg-violet-500", faIcon: "fa-house",         iconColor: "text-violet-500",  label: "Residential" },
@@ -49,7 +24,7 @@ export default async function SubscriptionDetailPage({
 }) {
   const cookieStore = cookies();
   const userId = cookieStore.get("ps_uid")?.value || "";
-  const purchase = await getPurchase(userId, params.id);
+  const purchase = await getPurchaseById(userId, params.id);
 
   if (!purchase) notFound();
 

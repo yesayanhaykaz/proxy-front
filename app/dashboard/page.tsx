@@ -1,21 +1,9 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import SubscriptionList from "./SubscriptionList";
+import { getPurchases, type Purchase } from "@/lib/purchases";
 
 export const dynamic = "force-dynamic";
-
-type Purchase = {
-  purchase_id: string;
-  package_name: string;
-  category: "Residential" | "Mobile" | "Datacenter" | "Fast";
-  status: "active" | "expired";
-  created_at: string;
-  proxy_username?: string;
-  proxy_password?: string;
-  host?: string;
-  port?: number;
-  protocol?: string;
-};
 
 type Sub = {
   id: string;
@@ -58,13 +46,8 @@ function mapPurchase(p: Purchase): Sub {
 }
 
 async function getSubscriptions(userId: string): Promise<Sub[]> {
-  if (!userId) return [];
-  const res = await fetch("https://api.proxiesseller.cc/api/purchases", {
-    headers: { "X-User-Id": userId },
-    cache: "no-store",
-  });
-  const data = await res.json();
-  return (data.purchases || []).map(mapPurchase);
+  const purchases = await getPurchases(userId);
+  return purchases.map(mapPurchase);
 }
 
 export default async function DashboardPage() {

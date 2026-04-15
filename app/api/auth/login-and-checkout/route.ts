@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { applyAuthCookies } from "@/lib/setAuthCookies";
+import { getBackendBase, getSiteOrigin } from "@/lib/env";
+
+function safeNext(next?: string) {
+  const value = (next || "").trim();
+  return value.startsWith("/") ? value : "";
+}
 
 function redirectBack(planId: string, error: string, email?: string) {
-  const u = new URL("/checkout", process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000");
+  const u = new URL("/checkout", getSiteOrigin());
   u.searchParams.set("plan", planId);
   u.searchParams.set("mode", "login");
   u.searchParams.set("error", encodeURIComponent(error));
@@ -14,6 +20,7 @@ export async function POST(req: Request) {
 
   const url = new URL(req.url);
   const planId = url.searchParams.get("plan") || "";
+  const next = safeNext(url.searchParams.get("next") || "");
 
   const form = await req.formData();
 
@@ -24,7 +31,7 @@ export async function POST(req: Request) {
   if (!email) return redirectBack(planId, "Email required.");
   if (!password) return redirectBack(planId, "Password required.", email);
 
-  const base = process.env.API_BASE || "http://127.0.0.1:8085/api";
+  const base = getBackendBase();
 
   const loginRes = await fetch(`${base}/login`, {
     method: "POST",
@@ -43,10 +50,12 @@ export async function POST(req: Request) {
     return redirectBack(planId, "Bad backend response.", email);
   }
 
-  const next = new URL("/checkout", process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000");
-  next.searchParams.set("plan", planId);
+  const destination = new URL(
+    next || `/checkout?plan=${encodeURIComponent(planId)}`,
+    getSiteOrigin()
+  );
 
-  const res = NextResponse.redirect(next, 303);
+  const res = NextResponse.redirect(destination, 303);
 
   return applyAuthCookies(res, userId, email);
 }

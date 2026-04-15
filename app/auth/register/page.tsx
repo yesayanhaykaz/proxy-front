@@ -22,9 +22,9 @@ export default function RegisterPage({
 }) {
   const c = cookies();
   const isLoggedIn = Boolean(c.get("ps_session")?.value);
-  if (isLoggedIn) redirect("/dashboard");
-
   const next = safeNext(searchParams?.next ? String(searchParams.next) : "/dashboard");
+  if (isLoggedIn) redirect(next);
+
   const error = searchParams?.error ? String(searchParams.error) : "";
 
   const errorText =
