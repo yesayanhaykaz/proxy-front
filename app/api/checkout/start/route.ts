@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getBackendBase } from "@/lib/env";
 
 export async function POST(req: Request) {
   try {
@@ -14,7 +13,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "not_logged_in" }, { status: 401 });
     }
 
-    const apiBase = getBackendBase();
+    const apiBase = process.env.API_BASE;
+    if (!apiBase) {
+      console.error("API_BASE env var is not set");
+      return NextResponse.json({ error: "server_misconfigured" }, { status: 500 });
+    }
 
     const form     = await req.formData();
     const plan     = String(form.get("plan")     || "");
@@ -100,7 +103,9 @@ export async function POST(req: Request) {
     }
 
     // Success — redirect to dashboard
-    return NextResponse.redirect(new URL("/dashboard", req.url), 303);
+    const host  = req.headers.get("host") || "localhost:3000";
+    const proto = "https";
+    return NextResponse.redirect(`${proto}://${host}/dashboard`);
 
   } catch (err) {
     console.error("Checkout error:", err);

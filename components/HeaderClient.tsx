@@ -1,17 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  DEFAULT_LOCALE,
-  SUPPORTED_LOCALES,
-  getLocaleFromPathname,
-  localizeHref,
-  switchLocaleInPath,
-  type Locale,
-  uiCopy,
-} from "@/lib/i18n";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 type Item = { href: string; label: string; icon?: string };
 
@@ -20,13 +11,40 @@ type Props = {
   email?: string;
 };
 
+const TOP_NAV = [
+  { href: "/residential-proxies", label: "Residential" },
+  { href: "/mobile-proxies",      label: "Mobile"      },
+  { href: "/datacenter-proxies",  label: "Datacenter"  },
+  { href: "/fast-proxies",        label: "Fast"        },
+];
+
+const PRICING_PROXY_TYPES: Item[] = [
+  { href: "/residential-proxies", label: "Residential Proxies", icon: "bi bi-house"           },
+  { href: "/datacenter-proxies",  label: "Datacenter Proxies",  icon: "bi bi-hdd-network"     },
+  { href: "/mobile-proxies",      label: "Mobile Proxies",      icon: "bi bi-phone"           },
+  { href: "/fast-proxies",        label: "Fast Proxies",        icon: "bi bi-lightning-charge" },
+];
+
+const PRICING_PLANS: Item[] = [
+  { href: "/pricing#starter",      label: "Starter Plan",      icon: "bi bi-rocket-takeoff" },
+  { href: "/pricing#professional", label: "Professional Plan", icon: "bi bi-briefcase"      },
+  { href: "/pricing#enterprise",   label: "Enterprise Plan",   icon: "bi bi-building"       },
+  { href: "/proxy-builder",        label: "Build Your Own",    icon: "bi bi-sliders"        },
+];
+
+const PRICING_EXTRAS: Item[] = [
+  { href: "/compare",  label: "Compare Packages",  icon: "bi bi-sliders"       },
+  { href: "/features", label: "Features Overview", icon: "bi bi-stars"         },
+  { href: "/blog",     label: "Proxy Guides",      icon: "bi bi-journal-text"  },
+];
+
 function MegaLink({ href, label, icon }: Item) {
   return (
     <Link
       href={href}
-      className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-700 transition-all hover:bg-amber-50 hover:text-slate-900"
+      className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-slate-700 transition-all hover:bg-indigo-50 hover:text-slate-900"
     >
-      <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600 transition-all group-hover:bg-amber-100 group-hover:text-amber-700">
+      <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600 transition-all group-hover:bg-indigo-100 group-hover:text-indigo-700">
         <i className={`${icon ?? "bi bi-arrow-right"} text-sm`} />
       </span>
       <span className="text-sm font-semibold">{label}</span>
@@ -45,56 +63,21 @@ function initialsFromEmail(email?: string) {
 }
 
 export function HeaderClient({ isLoggedIn = false, email = "" }: Props) {
-  const pathname = usePathname() || "/";
-  const locale = (getLocaleFromPathname(pathname) || DEFAULT_LOCALE) as Locale;
-  const copy = uiCopy[locale].header;
   const router = useRouter();
 
-  const [pricingOpen, setPricingOpen] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [pricingOpen,       setPricingOpen]       = useState(false);
+  const [mobileOpen,        setMobileOpen]        = useState(false);
   const [mobilePricingOpen, setMobilePricingOpen] = useState(false);
-  const [languageOpen, setLanguageOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
+  const [accountOpen,       setAccountOpen]       = useState(false);
 
   const pricingWrapRef = useRef<HTMLDivElement | null>(null);
-  const languageWrapRef = useRef<HTMLDivElement | null>(null);
   const accountWrapRef = useRef<HTMLDivElement | null>(null);
-
-  const topNav = useMemo(
-    () => [
-      { href: localizeHref(locale, "/residential-proxies"), label: copy.navResidential },
-      { href: localizeHref(locale, "/mobile-proxies"), label: copy.navMobile },
-      { href: localizeHref(locale, "/datacenter-proxies"), label: copy.navDatacenter },
-      { href: localizeHref(locale, "/fast-proxies"), label: copy.navFast },
-    ],
-    [copy.navDatacenter, copy.navFast, copy.navMobile, copy.navResidential, locale]
-  );
-
-  const pricingProxyTypes: Item[] = [
-    { href: localizeHref(locale, "/residential-proxies"), label: copy.pricingResidential, icon: "bi bi-house" },
-    { href: localizeHref(locale, "/datacenter-proxies"), label: copy.pricingDatacenter, icon: "bi bi-hdd-network" },
-    { href: localizeHref(locale, "/mobile-proxies"), label: copy.pricingMobile, icon: "bi bi-phone" },
-    { href: localizeHref(locale, "/fast-proxies"), label: copy.pricingFast, icon: "bi bi-lightning-charge" },
-  ];
-
-  const pricingPlans: Item[] = [
-    { href: localizeHref(locale, "/pricing"), label: copy.pricingStarter, icon: "bi bi-rocket-takeoff" },
-    { href: localizeHref(locale, "/pricing"), label: copy.pricingProfessional, icon: "bi bi-briefcase" },
-    { href: localizeHref(locale, "/pricing"), label: copy.pricingEnterprise, icon: "bi bi-building" },
-    { href: localizeHref(locale, "/proxy-builder"), label: copy.pricingBuilder, icon: "bi bi-sliders" },
-  ];
-
-  const pricingExtras: Item[] = [
-    { href: localizeHref(locale, "/pricing"), label: copy.pricingCompare, icon: "bi bi-columns-gap" },
-    { href: localizeHref(locale, "/pricing"), label: copy.pricingFeatures, icon: "bi bi-stars" },
-    { href: localizeHref(locale, "/blog"), label: copy.pricingGuides, icon: "bi bi-journal-text" },
-  ];
 
   const doLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST", credentials: "include", cache: "no-store" });
     setAccountOpen(false);
     setMobileOpen(false);
-    router.replace(localizeHref(locale, "/"));
+    router.replace("/");
     router.refresh();
   };
 
@@ -103,17 +86,11 @@ export function HeaderClient({ isLoggedIn = false, email = "" }: Props) {
       const t = e.target;
       if (t instanceof Node) {
         if (pricingWrapRef.current && !pricingWrapRef.current.contains(t)) setPricingOpen(false);
-        if (languageWrapRef.current && !languageWrapRef.current.contains(t)) setLanguageOpen(false);
         if (accountWrapRef.current && !accountWrapRef.current.contains(t)) setAccountOpen(false);
       }
     };
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setPricingOpen(false);
-        setLanguageOpen(false);
-        setAccountOpen(false);
-        setMobileOpen(false);
-      }
+      if (e.key === "Escape") { setPricingOpen(false); setAccountOpen(false); setMobileOpen(false); }
     };
     document.addEventListener("mousedown", onDocClick);
     document.addEventListener("keydown", onKeyDown);
@@ -124,29 +101,74 @@ export function HeaderClient({ isLoggedIn = false, email = "" }: Props) {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/92 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes shimmer {
+          0%   { background-position: -200% center; }
+          100% { background-position:  200% center; }
+        }
+        .custom-btn {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 7px 14px;
+          border-radius: 10px;
+          font-size: 13px;
+          font-weight: 800;
+          color: #fff;
+          border: none;
+          cursor: pointer;
+          text-decoration: none;
+          background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 50%, #7c3aed 100%);
+          background-size: 200% auto;
+          box-shadow: 0 2px 12px rgba(124,58,237,.35), 0 0 0 1px rgba(124,58,237,.2);
+          transition: box-shadow .2s, transform .15s, background-position .4s;
+          letter-spacing: .01em;
+        }
+        .custom-btn:hover {
+          background-position: right center;
+          box-shadow: 0 4px 20px rgba(124,58,237,.5), 0 0 0 1px rgba(124,58,237,.3);
+          transform: translateY(-1px);
+        }
+        .custom-btn:active { transform: scale(.97); }
+        .custom-btn .pulse-dot {
+          width: 6px; height: 6px; border-radius: 50%;
+          background: #a5f3fc;
+          box-shadow: 0 0 0 0 rgba(165,243,252,.6);
+          animation: pulse-ring 1.8s ease-out infinite;
+          flex-shrink: 0;
+        }
+        @keyframes pulse-ring {
+          0%   { box-shadow: 0 0 0 0 rgba(165,243,252,.7); }
+          70%  { box-shadow: 0 0 0 6px rgba(165,243,252,0); }
+          100% { box-shadow: 0 0 0 0 rgba(165,243,252,0); }
+        }
+      ` }} />
+
       <div className="container-page flex h-16 items-center justify-between">
-        <Link
-          href={localizeHref(locale, "/")}
-          className="flex items-center gap-2.5 font-bold text-slate-900 transition-opacity hover:opacity-80"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#ff8a3d] to-[#0f766e]">
+
+        {/* Brand */}
+        <Link href="/" className="flex items-center gap-2.5 font-bold text-slate-900 transition-opacity hover:opacity-80">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600">
             <i className="bi bi-shield-lock text-sm text-white" />
           </div>
           <span className="text-base">proxiesseller</span>
         </Link>
 
+        {/* Desktop nav */}
         <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
-          {topNav.map((item) => (
+          {TOP_NAV.map((i) => (
             <Link
-              key={item.href}
-              href={item.href}
+              key={i.href}
+              href={i.href}
               className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
-              {item.label}
+              {i.label}
             </Link>
           ))}
 
+          {/* Pricing mega menu */}
           <div
             ref={pricingWrapRef}
             className="relative"
@@ -156,59 +178,51 @@ export function HeaderClient({ isLoggedIn = false, email = "" }: Props) {
             <button
               type="button"
               className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
-              onClick={() => setPricingOpen((value) => !value)}
               aria-haspopup="menu"
               aria-expanded={pricingOpen}
+              onClick={() => setPricingOpen((v) => !v)}
             >
-              {copy.navPricing}
+              Pricing
               <i className={`bi bi-chevron-down text-[10px] transition-transform ${pricingOpen ? "rotate-180" : ""}`} />
             </button>
 
             {pricingOpen && (
               <>
                 <div className="absolute left-0 right-0 top-full h-4" />
-                <div className="absolute left-1/2 top-full mt-4 w-[min(920px,calc(100vw-32px))] -translate-x-1/2 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xl">
+                <div
+                  role="menu"
+                  className="absolute left-1/2 top-full mt-4 w-[min(920px,calc(100vw-32px))] -translate-x-1/2 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xl"
+                >
+                  <div className="pointer-events-none absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rotate-45 border-l border-t border-slate-200/80 bg-white" />
                   <div className="grid gap-8 md:grid-cols-3">
                     <div>
-                      <div className="mb-3 px-3 text-xs font-bold uppercase tracking-wider text-slate-500">
-                        {copy.pricingTypes}
-                      </div>
+                      <div className="mb-3 px-3 text-xs font-bold uppercase tracking-wider text-slate-500">Proxy Types</div>
                       <div className="space-y-1">
-                        {pricingProxyTypes.map((item) => (
-                          <MegaLink key={item.href + item.label} {...item} />
-                        ))}
+                        {PRICING_PROXY_TYPES.map((x) => <MegaLink key={x.href} {...x} />)}
                       </div>
                     </div>
                     <div>
-                      <div className="mb-3 px-3 text-xs font-bold uppercase tracking-wider text-slate-500">
-                        {copy.pricingPlans}
-                      </div>
+                      <div className="mb-3 px-3 text-xs font-bold uppercase tracking-wider text-slate-500">Plans</div>
                       <div className="space-y-1">
-                        {pricingPlans.map((item) => (
-                          <MegaLink key={item.href + item.label} {...item} />
-                        ))}
+                        {PRICING_PLANS.map((x) => <MegaLink key={x.href} {...x} />)}
                       </div>
                     </div>
                     <div>
-                      <div className="mb-3 px-3 text-xs font-bold uppercase tracking-wider text-slate-500">
-                        {copy.pricingResources}
-                      </div>
+                      <div className="mb-3 px-3 text-xs font-bold uppercase tracking-wider text-slate-500">Resources</div>
                       <div className="space-y-1">
-                        {pricingExtras.map((item) => (
-                          <MegaLink key={item.href + item.label} {...item} />
-                        ))}
+                        {PRICING_EXTRAS.map((x) => <MegaLink key={x.href} {...x} />)}
                       </div>
-                      <div className="mt-5 rounded-xl border border-amber-200/80 bg-gradient-to-br from-amber-50 to-cyan-50/40 p-4">
-                        <div className="text-sm font-bold text-slate-900">{copy.needHelpTitle}</div>
-                        <div className="mt-1 text-xs leading-relaxed text-slate-600">{copy.needHelpBody}</div>
+                      <div className="mt-5 rounded-xl border border-indigo-200/80 bg-gradient-to-br from-indigo-50 to-purple-50/50 p-4">
+                        <div className="text-sm font-bold text-slate-900">Need help choosing?</div>
+                        <div className="mt-1 text-xs leading-relaxed text-slate-600">
+                          Our team can help you find the perfect proxy solution for your needs.
+                        </div>
                         <div className="mt-3 flex gap-2">
-                          <Link href={localizeHref(locale, "/contact")} className="inline-flex items-center gap-1.5 rounded-lg bg-[#ff8a3d] px-3 py-1.5 text-xs font-bold text-white transition-all hover:bg-[#ff7b26]">
-                            <i className="bi bi-chat-dots" />
-                            {copy.contactSales}
+                          <Link href="/contact" className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white transition-all hover:bg-indigo-500">
+                            <i className="bi bi-chat-dots" />Contact Sales
                           </Link>
-                          <Link href={localizeHref(locale, "/faqs")} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50">
-                            <i className="bi bi-question-circle" />
-                            {copy.faq}
+                          <Link href="/faqs" className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50">
+                            <i className="bi bi-question-circle" />FAQ
                           </Link>
                         </div>
                       </div>
@@ -219,67 +233,26 @@ export function HeaderClient({ isLoggedIn = false, email = "" }: Props) {
             )}
           </div>
 
-          <Link
-            href={localizeHref(locale, "/proxy-builder")}
-            className="ml-1 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#ff8a3d] to-[#0f766e] px-4 py-2 text-sm font-extrabold text-white shadow-sm transition hover:-translate-y-0.5"
-          >
-            <span className="inline-flex h-2 w-2 rounded-full bg-cyan-100" />
-            {copy.buildCustom}
+          {/* ── CUSTOM CTA button ── */}
+          <Link href="/proxy-builder" className="custom-btn ml-1">
+            <span className="pulse-dot" />
+            <i className="bi bi-sliders text-xs" />
+            Build Custom
           </Link>
         </nav>
 
+        {/* Right actions (DESKTOP) */}
         <div className="hidden items-center gap-3 md:flex">
-          <div ref={languageWrapRef} className="relative">
-            <button
-              type="button"
-              onClick={() => setLanguageOpen((value) => !value)}
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
-              aria-haspopup="menu"
-              aria-expanded={languageOpen}
-            >
-              <i className="bi bi-globe2 text-sm text-slate-500" />
-              <span>{copy.language}</span>
-              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-bold uppercase text-slate-600">
-                {locale}
-              </span>
-              <i className={`bi bi-chevron-down text-[10px] transition-transform ${languageOpen ? "rotate-180" : ""}`} />
-            </button>
-
-            {languageOpen && (
-              <div
-                role="menu"
-                className="absolute right-0 mt-3 w-44 overflow-hidden rounded-xl border border-slate-200/80 bg-white p-2 shadow-xl"
-              >
-                {SUPPORTED_LOCALES.map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => {
-                      setLanguageOpen(false);
-                      router.push(switchLocaleInPath(pathname, item));
-                    }}
-                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-semibold transition-all ${
-                      item === locale
-                        ? "bg-slate-100 text-slate-900"
-                        : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
-                    }`}
-                  >
-                    <span className="uppercase">{item}</span>
-                    {item === locale ? <i className="bi bi-check2 text-slate-500" /> : null}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
           {isLoggedIn ? (
             <div ref={accountWrapRef} className="relative">
               <button
                 type="button"
-                onClick={() => setAccountOpen((value) => !value)}
+                onClick={() => setAccountOpen((v) => !v)}
                 className="group inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-100"
+                aria-haspopup="menu"
+                aria-expanded={accountOpen}
               >
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#ff8a3d] to-[#0f766e] text-xs font-bold text-white shadow-sm">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 text-xs font-bold text-white shadow-sm">
                   {initialsFromEmail(email)}
                 </span>
                 <i className={`bi bi-chevron-down text-[10px] text-slate-500 transition-transform ${accountOpen ? "rotate-180" : ""}`} />
@@ -288,22 +261,24 @@ export function HeaderClient({ isLoggedIn = false, email = "" }: Props) {
               {accountOpen && (
                 <div role="menu" className="absolute right-0 mt-3 w-64 overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-xl">
                   <div className="border-b border-slate-100 bg-slate-50 px-4 py-3">
-                    <div className="text-xs font-semibold text-slate-500">{email || "Account"}</div>
+                    <div className="text-xs font-semibold text-slate-500">Signed in as</div>
+                    <div className="mt-0.5 truncate text-sm font-bold text-slate-900">{email || "Account"}</div>
                   </div>
                   <div className="p-2">
                     {[
-                      { href: "/dashboard", label: copy.dashboard, icon: "bi-speedometer2" },
-                      { href: "/dashboard/billing", label: copy.billing, icon: "bi-credit-card" },
-                      { href: "/dashboard/settings", label: copy.settings, icon: "bi-gear" },
-                    ].map((item) => (
+                      { href: "/dashboard",          label: "Dashboard",       icon: "bi-speedometer2"   },
+                      { href: "/dashboard/billing",  label: "Billing",         icon: "bi-credit-card"    },
+                      { href: "/dashboard/profile",  label: "Profile",         icon: "bi-person-circle"  },
+                      { href: "/dashboard/settings", label: "Settings",        icon: "bi-gear"           },
+                    ].map(({ href, label, icon }) => (
                       <Link
-                        key={item.href}
-                        href={item.href}
+                        key={href}
+                        href={href}
                         onClick={() => setAccountOpen(false)}
                         className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-100 hover:text-slate-900"
                       >
-                        <i className={`bi ${item.icon} text-slate-400`} />
-                        {item.label}
+                        <i className={`bi ${icon} text-slate-400`} />
+                        {label}
                       </Link>
                     ))}
                     <div className="my-2 h-px bg-slate-100" />
@@ -313,7 +288,7 @@ export function HeaderClient({ isLoggedIn = false, email = "" }: Props) {
                       className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-600 transition-all hover:bg-red-50"
                     >
                       <i className="bi bi-box-arrow-right" />
-                      {copy.logout}
+                      Sign out
                     </button>
                   </div>
                 </div>
@@ -322,121 +297,139 @@ export function HeaderClient({ isLoggedIn = false, email = "" }: Props) {
           ) : (
             <>
               <Link href="/auth/login" className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">
-                {copy.login}
+                Login
               </Link>
-              <Link href="/auth/register" className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-slate-800">
-                {copy.createAccount}
+              <Link href="/auth/register" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-indigo-500">
+                Sign up
               </Link>
             </>
           )}
         </div>
 
+        {/* Mobile hamburger */}
         <button
           className="inline-flex items-center justify-center rounded-lg p-2 text-slate-700 transition-colors hover:bg-slate-100 md:hidden"
           aria-label="Open menu"
-          onClick={() => setMobileOpen((value) => !value)}
+          onClick={() => setMobileOpen((v) => !v)}
         >
           <i className={`bi ${mobileOpen ? "bi-x-lg" : "bi-list"} text-xl`} />
         </button>
       </div>
 
+      {/* Mobile drawer */}
       {mobileOpen && (
         <div className="border-t border-slate-200 bg-white md:hidden">
           <div className="container-page py-4">
             <div className="grid gap-1">
-              <div className="mb-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  {copy.language}
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {SUPPORTED_LOCALES.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => {
-                        setMobileOpen(false);
-                        router.push(switchLocaleInPath(pathname, item));
-                      }}
-                      className={`rounded-lg px-3 py-2 text-xs font-bold uppercase transition ${
-                        item === locale
-                          ? "bg-slate-900 text-white"
-                          : "bg-white text-slate-700 hover:bg-slate-100"
-                      }`}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {topNav.map((item) => (
+              {TOP_NAV.map((i) => (
                 <Link
-                  key={item.href}
-                  href={item.href}
+                  key={i.href}
+                  href={i.href}
                   onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
                 >
-                  {item.label}
+                  {i.label}
                 </Link>
               ))}
 
+              {/* Mobile CUSTOM CTA */}
               <Link
-                href={localizeHref(locale, "/proxy-builder")}
+                href="/proxy-builder"
                 onClick={() => setMobileOpen(false)}
-                className="mt-1 inline-flex justify-center rounded-xl bg-gradient-to-r from-[#ff8a3d] to-[#0f766e] px-4 py-3 text-sm font-extrabold text-white"
+                className="custom-btn mt-1 justify-center"
               >
-                {copy.buildCustom}
+                <span className="pulse-dot" />
+                <i className="bi bi-sliders text-xs" />
+                Build Custom Proxy
               </Link>
 
+              {/* Pricing accordion */}
               <button
                 type="button"
-                onClick={() => setMobilePricingOpen((value) => !value)}
+                onClick={() => setMobilePricingOpen((v) => !v)}
                 className="mt-2 flex w-full items-center justify-between rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100"
               >
-                <span>{copy.navPricing}</span>
+                <span>Pricing</span>
                 <i className={`bi bi-chevron-down text-xs transition-transform ${mobilePricingOpen ? "rotate-180" : ""}`} />
               </button>
 
               {mobilePricingOpen && (
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                   <div className="grid gap-1">
-                    {[...pricingProxyTypes, ...pricingPlans, ...pricingExtras].map((item) => (
-                      <Link
-                        key={item.href + item.label}
-                        href={item.href}
-                        onClick={() => setMobileOpen(false)}
-                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-white hover:text-slate-900"
-                      >
-                        <i className={`${item.icon} text-slate-500`} />
-                        {item.label}
+                    <div className="px-2 text-xs font-bold uppercase tracking-wider text-slate-500">Proxy Types</div>
+                    {PRICING_PROXY_TYPES.map((x) => (
+                      <Link key={x.href} href={x.href} onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-white hover:text-slate-900">
+                        <i className={`${x.icon} text-slate-500`} />{x.label}
                       </Link>
                     ))}
+                    <div className="mt-2 px-2 text-xs font-bold uppercase tracking-wider text-slate-500">Plans</div>
+                    {PRICING_PLANS.map((x) => (
+                      <Link key={x.href} href={x.href} onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-white hover:text-slate-900">
+                        <i className={`${x.icon} text-slate-500`} />{x.label}
+                      </Link>
+                    ))}
+                    <div className="mt-2 px-2 text-xs font-bold uppercase tracking-wider text-slate-500">Resources</div>
+                    {PRICING_EXTRAS.map((x) => (
+                      <Link key={x.href} href={x.href} onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-white hover:text-slate-900">
+                        <i className={`${x.icon} text-slate-500`} />{x.label}
+                      </Link>
+                    ))}
+                    <div className="mt-3 flex gap-2">
+                      <Link href="/contact" onClick={() => setMobileOpen(false)}
+                        className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold text-white transition-all hover:bg-indigo-500">
+                        <i className="bi bi-chat-dots" />Contact
+                      </Link>
+                      <Link href="/faqs" onClick={() => setMobileOpen(false)}
+                        className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition-all hover:bg-slate-100">
+                        <i className="bi bi-question-circle" />FAQ
+                      </Link>
+                    </div>
                   </div>
                 </div>
               )}
 
+              {/* Mobile account actions */}
               {isLoggedIn ? (
                 <div className="mt-3 grid gap-2">
-                  <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-bold text-white">
-                    <i className="bi bi-speedometer2" />
-                    {copy.dashboard}
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5">
+                    <div className="text-xs font-semibold text-slate-500">Signed in as</div>
+                    <div className="mt-0.5 truncate text-sm font-bold text-slate-900">{email || "Account"}</div>
+                  </div>
+                  <Link href="/dashboard" onClick={() => setMobileOpen(false)}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white transition-all hover:bg-indigo-500">
+                    <i className="bi bi-speedometer2" />Dashboard
                   </Link>
-                  <Link href="/dashboard/billing" onClick={() => setMobileOpen(false)} className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700">
-                    <i className="bi bi-credit-card text-slate-400" />
-                    {copy.billing}
-                  </Link>
-                  <button type="button" onClick={doLogout} className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600">
-                    <i className="bi bi-box-arrow-right" />
-                    {copy.logout}
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link href="/dashboard/billing" onClick={() => setMobileOpen(false)}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50">
+                      <i className="bi bi-credit-card text-slate-400" />Billing
+                    </Link>
+                    <Link href="/dashboard/profile" onClick={() => setMobileOpen(false)}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50">
+                      <i className="bi bi-person-circle text-slate-400" />Profile
+                    </Link>
+                    <Link href="/dashboard/settings" onClick={() => setMobileOpen(false)}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50">
+                      <i className="bi bi-gear text-slate-400" />Settings
+                    </Link>
+                  </div>
+                  <button type="button" onClick={doLogout}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition-all hover:bg-red-100">
+                    <i className="bi bi-box-arrow-right" />Sign out
                   </button>
                 </div>
               ) : (
                 <div className="mt-3 grid gap-2">
-                  <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700">
-                    {copy.login}
+                  <Link href="/auth/login" onClick={() => setMobileOpen(false)}
+                    className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50">
+                    Login
                   </Link>
-                  <Link href="/auth/register" onClick={() => setMobileOpen(false)} className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-bold text-white">
-                    {copy.createAccount}
+                  <Link href="/auth/register" onClick={() => setMobileOpen(false)}
+                    className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white transition-all hover:bg-indigo-500">
+                    Sign up
                   </Link>
                 </div>
               )}

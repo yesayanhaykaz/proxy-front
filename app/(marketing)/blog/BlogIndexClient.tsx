@@ -4,7 +4,6 @@
 import Link from "next/link";
 import type { BlogBadge, BlogPost } from "@/lib/blog";
 import { useMemo, useState } from "react";
-import { DEFAULT_LOCALE, localizeHref, type Locale } from "@/lib/i18n";
 
 type Guide = {
   title: string;
@@ -15,42 +14,6 @@ type Guide = {
   tags?: string[];
   readTime?: string;
   publishDate?: string;
-};
-
-type BlogIndexLabels = {
-  badge: string;
-  heroTitle: string;
-  heroHighlight: string;
-  heroBody: string;
-  browseGuides: string;
-  documentation: string;
-  integrationsChip: string;
-  advancedChip: string;
-  useCasesChip: string;
-  readArticle: string;
-  showAll: string;
-  showLess: string;
-  integrationsTitle: string;
-  integrationsSubtitle: string;
-  advancedTitle: string;
-  advancedSubtitle: string;
-  useCasesTitle: string;
-  useCasesSubtitle: string;
-  newsletterTitle: string;
-  newsletterBody: string;
-  newsletterPlaceholder: string;
-  newsletterButton: string;
-  newsletterFootnote: string;
-  ctaTitle: string;
-  ctaBody: string;
-  ctaContact: string;
-  ctaPricing: string;
-  featureOneTitle: string;
-  featureOneBody: string;
-  featureTwoTitle: string;
-  featureTwoBody: string;
-  featureThreeTitle: string;
-  featureThreeBody: string;
 };
 
 function Badge({ type }: { type?: BlogBadge }) {
@@ -70,7 +33,7 @@ function Badge({ type }: { type?: BlogBadge }) {
   );
 }
 
-function GuideCard({ g, labels }: { g: Guide; labels: BlogIndexLabels }) {
+function GuideCard({ g }: { g: Guide }) {
   return (
     <article className="group">
       <Link
@@ -111,7 +74,7 @@ function GuideCard({ g, labels }: { g: Guide; labels: BlogIndexLabels }) {
 
             <div className="mt-4 flex items-center justify-between">
               <span className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600">
-                {labels.readArticle} <i className="bi bi-arrow-right transition-transform group-hover:translate-x-1" />
+                Read article <i className="bi bi-arrow-right transition-transform group-hover:translate-x-1" />
               </span>
               {g.readTime && (
                 <span className="text-xs font-medium text-slate-500">
@@ -132,14 +95,12 @@ function Section({
   title,
   subtitle,
   items,
-  labels,
   initialCount = 6,
 }: {
   id: string;
   title: string;
   subtitle: string;
   items: Guide[];
-  labels: BlogIndexLabels;
   initialCount?: number;
 }) {
   const [showAll, setShowAll] = useState(false);
@@ -159,7 +120,7 @@ function Section({
             onClick={() => setShowAll((v) => !v)}
             className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-900 shadow-sm transition hover:bg-slate-50"
           >
-            {showAll ? labels.showLess : labels.showAll}
+            {showAll ? "Show less" : "Show all"}
             <i className={`bi ${showAll ? "bi-chevron-up" : "bi-chevron-down"}`} />
           </button>
         ) : null}
@@ -167,14 +128,14 @@ function Section({
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {visible.map((g) => (
-          <GuideCard key={g.href} g={g} labels={labels} />
+          <GuideCard key={g.href} g={g} />
         ))}
       </div>
     </section>
   );
 }
 
-function toGuides(posts: BlogPost[], locale: string): Guide[] {
+function toGuides(posts: BlogPost[]): Guide[] {
   return posts.map((p) => ({
     badge: p.badge,
     title: p.title,
@@ -183,7 +144,7 @@ function toGuides(posts: BlogPost[], locale: string): Guide[] {
     icon: p.icon,
     tags: p.tags,
     readTime: p.readTime,
-    publishDate: new Date(p.publishDateISO).toLocaleDateString(locale, {
+    publishDate: new Date(p.publishDateISO).toLocaleDateString("en-US", {
       month: "short",
       day: "2-digit",
       year: "numeric",
@@ -191,28 +152,20 @@ function toGuides(posts: BlogPost[], locale: string): Guide[] {
   }));
 }
 
-export function BlogIndexClient({
-  posts,
-  labels,
-  locale = DEFAULT_LOCALE,
-}: {
-  posts: BlogPost[];
-  labels: BlogIndexLabels;
-  locale?: Locale;
-}) {
+export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
   const integrations = useMemo(
-    () => toGuides(posts.filter((p) => p.category === "Integration"), locale),
-    [locale, posts]
+    () => toGuides(posts.filter((p) => p.category === "Integration")),
+    [posts]
   );
 
   const advanced = useMemo(
-    () => toGuides(posts.filter((p) => p.category === "Advanced"), locale),
-    [locale, posts]
+    () => toGuides(posts.filter((p) => p.category === "Advanced")),
+    [posts]
   );
 
   const useCases = useMemo(
-    () => toGuides(posts.filter((p) => p.category === "Use Case"), locale),
-    [locale, posts]
+    () => toGuides(posts.filter((p) => p.category === "Use Case")),
+    [posts]
   );
 
   return (
@@ -237,18 +190,19 @@ export function BlogIndexClient({
           <div className="mx-auto max-w-3xl text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200/80 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700">
               <i className="bi bi-journal-text" />
-              {labels.badge}
+              Blog & Guides
             </div>
 
             <h1 className="mt-6 text-5xl font-black tracking-tight text-slate-900 md:text-6xl">
-              {labels.heroTitle}{" "}
+              Proxy integration{" "}
               <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                {labels.heroHighlight}
+                guides
               </span>
             </h1>
 
             <p className="mt-6 text-lg leading-relaxed text-slate-600">
-              {labels.heroBody}
+              Step-by-step tutorials for popular tools, advanced optimization techniques, and
+              industry-specific use cases.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -256,27 +210,27 @@ export function BlogIndexClient({
                 href="#integrations"
                 className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition-all hover:bg-indigo-500"
               >
-                {labels.browseGuides} <i className="bi bi-arrow-down" />
+                Browse guides <i className="bi bi-arrow-down" />
               </Link>
               <Link
-                href={localizeHref(locale, "/documentation")}
+                href="/documentation"
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3.5 text-sm font-bold text-slate-900 shadow-sm transition-all hover:bg-slate-50"
               >
                 <i className="bi bi-book" />
-                {labels.documentation}
+                Documentation
               </Link>
             </div>
 
             {/* quick jumps */}
             <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-sm font-semibold">
               <a className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-700 hover:bg-slate-50" href="#integrations">
-                {labels.integrationsChip}
+                Integrations
               </a>
               <a className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-700 hover:bg-slate-50" href="#advanced">
-                {labels.advancedChip}
+                Advanced
               </a>
               <a className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-700 hover:bg-slate-50" href="#use-cases">
-                {labels.useCasesChip}
+                Use cases
               </a>
             </div>
           </div>
@@ -287,10 +241,9 @@ export function BlogIndexClient({
       <main className="container-page">
         <Section
           id="integrations"
-          title={labels.integrationsTitle}
-          subtitle={labels.integrationsSubtitle}
+          title="Popular integration guides"
+          subtitle="Most commonly used tools and frameworks with detailed setup instructions"
           items={integrations}
-          labels={labels}
           initialCount={6}
         />
 
@@ -298,10 +251,9 @@ export function BlogIndexClient({
 
         <Section
           id="advanced"
-          title={labels.advancedTitle}
-          subtitle={labels.advancedSubtitle}
+          title="Advanced topics"
+          subtitle="Deep dive into proxy optimization, rotation strategies, and advanced configurations"
           items={advanced}
-          labels={labels}
           initialCount={6}
         />
 
@@ -309,10 +261,9 @@ export function BlogIndexClient({
 
         <Section
           id="use-cases"
-          title={labels.useCasesTitle}
-          subtitle={labels.useCasesSubtitle}
+          title="Use case guides"
+          subtitle="Industry-specific guides for common proxy use cases and workflows"
           items={useCases}
-          labels={labels}
           initialCount={6}
         />
 
@@ -324,27 +275,27 @@ export function BlogIndexClient({
                 <i className="bi bi-envelope text-xl" />
               </div>
 
-              <h2 className="mt-6 text-3xl font-black text-slate-900">{labels.newsletterTitle}</h2>
+              <h2 className="mt-6 text-3xl font-black text-slate-900">Get proxy tips & guides</h2>
 
               <p className="mt-3 text-base text-slate-600">
-                {labels.newsletterBody}
+                Subscribe to get new tutorials, optimization tips, and industry insights.
               </p>
 
               <form className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
                 <input
                   type="email"
-                  placeholder={labels.newsletterPlaceholder}
+                  placeholder="your@email.com"
                   className="flex-1 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-900 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 sm:max-w-xs"
                 />
                 <button
                   type="submit"
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition-all hover:bg-indigo-500"
                 >
-                  {labels.newsletterButton} <i className="bi bi-arrow-right" />
+                  Subscribe <i className="bi bi-arrow-right" />
                 </button>
               </form>
 
-              <p className="mt-4 text-xs text-slate-500">{labels.newsletterFootnote}</p>
+              <p className="mt-4 text-xs text-slate-500">No spam. Unsubscribe anytime.</p>
             </div>
           </div>
         </section>
@@ -354,23 +305,23 @@ export function BlogIndexClient({
           <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm md:p-12">
             <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
               <div>
-                <h2 className="text-3xl font-black text-slate-900">{labels.ctaTitle}</h2>
+                <h2 className="text-3xl font-black text-slate-900">Need custom help?</h2>
                 <p className="mt-3 text-base leading-relaxed text-slate-600">
-                  {labels.ctaBody}
+                  Get recommendations on proxy type, rotation, and authentication for your tool stack.
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link
-                    href={localizeHref(locale, "/contact")}
+                    href="/contact"
                     className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition-all hover:bg-indigo-500"
                   >
                     <i className="bi bi-chat-dots" />
-                    {labels.ctaContact}
+                    Talk to an expert
                   </Link>
                   <Link
-                    href={localizeHref(locale, "/pricing")}
+                    href="/pricing"
                     className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3.5 text-sm font-bold text-slate-900 shadow-sm transition-all hover:bg-slate-50"
                   >
-                    {labels.ctaPricing}
+                    View pricing
                   </Link>
                 </div>
               </div>
@@ -379,24 +330,24 @@ export function BlogIndexClient({
                 <div className="flex items-start gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <i className="bi bi-lightning-charge text-2xl text-indigo-600" />
                   <div>
-                    <h3 className="font-bold text-slate-900">{labels.featureOneTitle}</h3>
-                    <p className="mt-1 text-sm text-slate-600">{labels.featureOneBody}</p>
+                    <h3 className="font-bold text-slate-900">Fast response time</h3>
+                    <p className="mt-1 text-sm text-slate-600">Get answers from our technical team</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <i className="bi bi-code-slash text-2xl text-indigo-600" />
                   <div>
-                    <h3 className="font-bold text-slate-900">{labels.featureTwoTitle}</h3>
-                    <p className="mt-1 text-sm text-slate-600">{labels.featureTwoBody}</p>
+                    <h3 className="font-bold text-slate-900">Custom code examples</h3>
+                    <p className="mt-1 text-sm text-slate-600">Tailored snippets for your stack</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <i className="bi bi-headset text-2xl text-indigo-600" />
                   <div>
-                    <h3 className="font-bold text-slate-900">{labels.featureThreeTitle}</h3>
-                    <p className="mt-1 text-sm text-slate-600">{labels.featureThreeBody}</p>
+                    <h3 className="font-bold text-slate-900">Ongoing support</h3>
+                    <p className="mt-1 text-sm text-slate-600">Help when you scale up</p>
                   </div>
                 </div>
               </div>

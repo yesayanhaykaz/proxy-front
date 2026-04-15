@@ -1,26 +1,18 @@
-import { NextResponse } from "next/server";
-import { getSiteOrigin } from "@/lib/env";
-import { SUPPORTED_LOCALES } from "@/lib/i18n";
+import { NextResponse } from 'next/server'
 
 export async function GET() {
-  const base = getSiteOrigin();
-  const today = new Date().toISOString();
+
+  const base = 'https://www.proxiesseller.cc'
+  const today = new Date().toISOString()
 
   const categories = [
-    "/residential-proxies",
-    "/mobile-proxies",
-    "/datacenter-proxies",
-    "/fast-proxies",
-    "/proxies-for-instagram",
-    "/proxies-for-scraping",
-    "/proxies-for-tiktok",
-  ];
+    '/residential-proxies',
+    '/mobile-proxies',
+    '/datacenter-proxies',
+    '/fast-proxies'
+  ]
 
-  const localized = SUPPORTED_LOCALES.flatMap((locale) =>
-    categories.map((url) => (locale === "en" ? `/en${url}` : `/${locale}${url}`))
-  );
-
-  const urls = localized.map(url => `
+  const urls = categories.map(url => `
   <url>
     <loc>${base}${url}</loc>
     <lastmod>${today}</lastmod>

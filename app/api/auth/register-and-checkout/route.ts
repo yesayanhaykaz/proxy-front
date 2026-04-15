@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
 import { applyAuthCookies } from "@/lib/setAuthCookies";
-import { getBackendBase, getSiteOrigin } from "@/lib/env";
-
-function safeNext(next?: string) {
-  const value = (next || "").trim();
-  return value.startsWith("/") ? value : "";
-}
 
 export async function POST(req: Request) {
+
   const url = new URL(req.url);
   const planId = url.searchParams.get("plan") || "";
-  const next = safeNext(url.searchParams.get("next") || "");
 
   const form = await req.formData();
 
@@ -19,7 +13,7 @@ export async function POST(req: Request) {
 
   if (!planId) throw new Error("Missing plan");
 
-  const base = getBackendBase();
+  const base = process.env.API_BASE || "http://127.0.0.1:8085/api";
 
   const regRes = await fetch(`${base}/register`, {
     method: "POST",
@@ -45,12 +39,10 @@ export async function POST(req: Request) {
 
   const userId = String(json.user_id || "");
 
-  const destination = new URL(
-    next || `/checkout?plan=${encodeURIComponent(planId)}`,
-    getSiteOrigin()
-  );
+  const next = new URL("/checkout", process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000");
+  next.searchParams.set("plan", planId);
 
-  const res = NextResponse.redirect(destination, 303);
+  const res = NextResponse.redirect(next, 303);
 
   return applyAuthCookies(res, userId, email);
 }

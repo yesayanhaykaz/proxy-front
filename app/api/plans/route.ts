@@ -1,10 +1,8 @@
-import { getBackendBase } from "@/lib/env";
-
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
-    const base = getBackendBase();
+    const base = process.env.API_BASE || "http://localhost:8081/api";
     const { searchParams } = new URL(req.url);
     const category = (searchParams.get("category") || "").toLowerCase();
 

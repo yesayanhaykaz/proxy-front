@@ -1,8 +1,7 @@
-import { NextResponse } from "next/server";
-import { getSiteOrigin } from "@/lib/env";
+import { NextResponse } from 'next/server'
 
 export async function GET() {
-  const site = getSiteOrigin();
+
   const robots = `
 User-agent: *
 Allow: /
@@ -11,10 +10,10 @@ Disallow: /auth/
 Disallow: /api/
 Disallow: /admin/
 
-Sitemap: ${site}/sitemap.xml
+Sitemap: https://www.proxiesseller.cc/sitemap.xml
 `
 
   return new NextResponse(robots.trim(), {
-    headers: { "Content-Type": "text/plain" },
-  });
+    headers: { 'Content-Type': 'text/plain' }
+  })
 }

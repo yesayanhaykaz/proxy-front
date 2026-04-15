@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { applySessionCookies } from "@/lib/auth";
-import { getBackendBase, getSiteOrigin } from "@/lib/env";
+import { setSession } from "@/lib/auth";
 
 function safeNext(n: string) {
   const t = (n || "").trim();
@@ -16,7 +15,8 @@ function errRedirect(origin: string, next: string, code: string) {
 
 export async function POST(req: Request) {
   try {
-    const origin = getSiteOrigin();
+
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
     const form = await req.formData();
 
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     if (confirm && confirm !== password)
       return errRedirect(origin, next, "password_mismatch");
 
-    const base = getBackendBase();
+    const base = (process.env.API_BASE || "http://127.0.0.1:8085/api").replace(/\/$/, "");
 
     // 1️⃣ Register
     const regRes = await fetch(`${base}/register`, {
@@ -84,13 +84,26 @@ export async function POST(req: Request) {
       return NextResponse.redirect(u, 303);
     }
 
+    // 🔐 session cookie
+    setSession({ id: userId, email });
+
     const res = NextResponse.redirect(new URL(next, origin), 303);
-    applySessionCookies(res.cookies, { id: userId, email });
+
+    // ✅ dashboard cookies
+    res.cookies.set("ps_uid", userId, {
+      path: "/",
+      sameSite: "lax",
+    });
+
+    res.cookies.set("ps_email", encodeURIComponent(email), {
+      path: "/",
+      sameSite: "lax",
+    });
 
     return res;
 
   } catch {
-    const origin = getSiteOrigin();
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
     return errRedirect(origin, "/dashboard", "server_error");
   }
 }

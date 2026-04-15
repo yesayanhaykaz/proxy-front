@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { getPurchases, type Purchase } from "@/lib/purchases";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +9,26 @@ export const metadata: Metadata = {
   description: "Manage your plan, invoices, and transaction history.",
   robots: { index: false, follow: false },
 };
+
+type Purchase = {
+  purchase_id: string;
+  package_name: string;
+  category: string;
+  price_cents: number;
+  created_at: string;
+  status: string;
+};
+
+async function getPurchases(userId: string): Promise<Purchase[]> {
+  if (!userId) return [];
+  const res = await fetch("https://api.proxiesseller.cc/api/purchases", {
+    headers: { "X-User-Id": userId },
+    cache: "no-store",
+  });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.purchases || [];
+}
 
 function fmt(cents: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
@@ -112,7 +131,7 @@ export default async function BillingHistoryPage() {
                   )}
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-3xl font-extrabold mono">{fmt(latest.price_cents ?? 0)}</p>
+                  <p className="text-3xl font-extrabold mono">{fmt(latest.price_cents)}</p>
                   <p className="text-xs text-slate-400 mt-1">one-time</p>
                   <Link href="/pricing" className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-violet-600 hover:text-violet-700 transition-colors">
                     <i className="fa-solid fa-arrow-up-right-from-square text-[10px]" />Upgrade
@@ -196,7 +215,7 @@ export default async function BillingHistoryPage() {
                             )}
                           </div>
                           <div className="col-span-1 text-right">
-                            <span className="font-extrabold mono text-sm text-slate-900">{fmt(p.price_cents ?? 0)}</span>
+                            <span className="font-extrabold mono text-sm text-slate-900">{fmt(p.price_cents)}</span>
                           </div>
                         </div>
                       );

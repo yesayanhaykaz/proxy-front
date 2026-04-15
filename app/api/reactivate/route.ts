@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { getBackendBase } from "@/lib/env";
 
 export async function POST(req: NextRequest) {
   const cookieStore = cookies();
@@ -19,7 +18,7 @@ export async function POST(req: NextRequest) {
 
   // Call your backend reactivation endpoint.
   // Adjust the URL and payload shape to match your API.
-  const res = await fetch(`${getBackendBase()}/reactivate`, {
+  const res = await fetch("https://api.proxiesseller.cc/api/reactivate", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

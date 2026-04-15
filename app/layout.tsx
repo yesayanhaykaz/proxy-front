@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { cookies } from "next/headers";
 import "./globals.css";
 
 import { Header } from "@/components/Header.server";
@@ -8,7 +7,6 @@ import { Footer } from "@/components/Footer";
 import LiveChat from "@/components/LiveChat";
 
 import { Sora, JetBrains_Mono } from "next/font/google";
-import { DEFAULT_LOCALE, detectLocale } from "@/lib/i18n";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -105,11 +103,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieLocale = cookies().get("ps_locale")?.value;
-  const htmlLang = cookieLocale ? detectLocale(cookieLocale) : DEFAULT_LOCALE;
-
   return (
-    <html lang={htmlLang} className={`${sora.variable} ${mono.variable}`}>
+    <html lang="en" className={`${sora.variable} ${mono.variable}`}>
       <head>
         {/* Yandex Metrika */}
         <Script

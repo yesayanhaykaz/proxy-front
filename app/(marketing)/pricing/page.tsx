@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PricingGrid } from "@/components/PricingGrid";
 import { TrustedMarquee } from "@/components/marketing/TrustedMarquee";
-import { getSiteOrigin } from "@/lib/env";
+import { apiGet, type ProxyPlan } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "Proxy Pricing | Residential, Mobile, Datacenter & SOCKS5 — Proxiesseller",
@@ -19,6 +19,13 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
+function getSiteUrl() {
+  // Use NEXT_PUBLIC_SITE_URL if you set it, else fallback in dev
+  const u = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || "http://localhost:3000";
+  return u.replace(/\/$/, "");
+}
+
+
 function Chip({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-indigo-200/80 bg-indigo-50 px-3.5 py-1.5 text-xs font-semibold text-indigo-700 transition-all hover:border-indigo-300 hover:bg-indigo-100">
@@ -102,7 +109,7 @@ function StepCard({
 }
 
 export default async function PricingPage() {
-  const site = getSiteOrigin();
+  const site = getSiteUrl();
   const r = await fetch(`${site}/api/plans`, { cache: "no-store" });
   const plans = r.ok ? await r.json() : [];
 

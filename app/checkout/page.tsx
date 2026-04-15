@@ -3,7 +3,6 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { CheckoutAuthPanel } from "@/components/checkout/CheckoutAuthPanel";
 import { getSession } from "@/lib/auth";
-import { getBackendBase } from "@/lib/env";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -15,7 +14,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 async function getPlan(planId: string) {
-  const base = getBackendBase();
+  const base = process.env.API_BASE || "http://localhost:8081/api";
   const r = await fetch(`${base}/packages`, { cache: "no-store" });
   if (!r.ok) return null;
   const pkgs: any[] = await r.json();

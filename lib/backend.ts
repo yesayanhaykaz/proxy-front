@@ -1,7 +1,6 @@
-import { getBackendBase } from "@/lib/env";
-
 export function backendBase() {
-  return getBackendBase();
+  const base = process.env.API_BASE || "http://localhost:8081/api";
+  return base.replace(/\/$/, "");
 }
 
 export async function backendGetJson<T>(path: string): Promise<T> {
